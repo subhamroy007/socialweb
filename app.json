@@ -1,0 +1,11 @@
+{
+  "expo": {
+    "name": "socialweb",
+    "slug": "socialweb",
+    "version": "1.0.0",
+    "assetBundlePatterns": [
+      "**/*"
+    ]
+  },
+  "name": "socialweb"
+}
