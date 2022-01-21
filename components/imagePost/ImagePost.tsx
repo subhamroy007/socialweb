@@ -1,55 +1,127 @@
-import React, { useCallback } from "react";
+import { Component, ReactNode } from "react";
 import { ListRenderItemInfo, StyleSheet, View } from "react-native";
 import { FlatList } from "react-native-gesture-handler";
-import Animated, { Easing } from "react-native-reanimated";
-import { RootState, useAppSelector } from "../../store/appStore";
+import Animated, {
+  Easing,
+  FadeInUp,
+  FadeOutDown,
+  SequencedTransition,
+} from "react-native-reanimated";
+import { shallowEqual } from "react-redux";
 import {
-  selectImagePostCaption,
-  selectImagePostHashTagList,
-} from "../../store/imagePost/selectors";
-import { SIZE_REF_12, SIZE_REF_8, WINDOW_WIDTH } from "../../utility/constants";
+  SIZE_REF_12,
+  SIZE_REF_6,
+  SIZE_REF_8,
+  WINDOW_WIDTH,
+} from "../../utility/constants";
 import { createKeyExtractor } from "../../utility/helpers";
-import { Id } from "../../utility/types";
+import { HashTagShortResponse, ImagePostResponse } from "../../utility/types";
+import { MediumText } from "../../utility/ui";
+import Avatar from "../global/Avatar";
 import CollapsableText from "../global/CollapsableText";
-import { HashTag } from "../global/HighlightedItem";
+import Header from "../global/Header";
+import HighlightedItem from "../global/HighlightedItem";
+import Icon from "../global/Icon";
+import Info from "../global/Info";
 import ItemSeparator from "../global/ItemSeparator";
-import PostHeader from "../videoPost/PostHeader";
 import ImagePostBody from "./ImagePostBody";
 import ImagePostControls from "./ImagePostControls";
 
 const keyExtractor = createKeyExtractor("hashtag");
 
-const renderItem = (item: ListRenderItemInfo<string>) => {
-  return <HashTag id={item.item} />;
+const itemSeparatorCallback = () => (
+  <ItemSeparator axis="vertical" length={SIZE_REF_8} />
+);
+
+const renderItem = (item: ListRenderItemInfo<HashTagShortResponse>) => {
+  return (
+    <HighlightedItem text={item.item.name} type="solid" size={SIZE_REF_12} />
+  );
 };
 
-const itemSeparatorCallback = () => {
-  return <ItemSeparator axis="vertical" length={SIZE_REF_8} />;
-};
+export default class ImagePost extends Component<ImagePostResponse> {
+  constructor(props: ImagePostResponse) {
+    super(props);
+  }
 
-const ImagePost = React.memo<Id>(
-  ({ id }) => {
-    const immutableDataSelectorCallback = useCallback(
-      (state: RootState) => {
-        const caption = selectImagePostCaption(state, id);
-        const hashTagList = selectImagePostHashTagList(state, id);
-        return { caption, hashTagList };
-      },
-      [id]
-    );
+  shouldComponentUpdate(nextProps: ImagePostResponse) {
+    const {
+      author: nextAuthor,
+      likes: nextLikes,
+      ...restNextProps
+    } = nextProps;
 
-    const { caption, hashTagList } = useAppSelector(
-      immutableDataSelectorCallback
-    );
+    const { author: prevAuthor, likes: prevLikes, ...restProps } = this.props;
 
     return (
-      <Animated.View style={[styles.rootContainerStaticStyle]}>
-        <PostHeader id={id} postType="image" />
-        <ImagePostBody id={id} />
-        <ImagePostControls id={id} />
-        {hashTagList && hashTagList.length > 0 && (
+      !shallowEqual(nextAuthor, prevAuthor) ||
+      !shallowEqual(nextLikes, prevLikes) ||
+      !shallowEqual(restNextProps, restProps)
+    );
+  }
+
+  render(): ReactNode {
+    const {
+      author: { hasUnSeenStroy, id: userId, profilePictureUri, socialId },
+      caption,
+      hasSaved,
+      hashtags,
+      likes: { filteredLikes, hasLiked, noOfLikes },
+      timestamp,
+      id,
+      children,
+      ...restProps
+    } = this.props;
+
+    return (
+      <Animated.View
+        style={styles.rootContainerStaticStyle}
+        entering={FadeInUp.duration(200).easing(Easing.in(Easing.quad))}
+        exiting={FadeOutDown.duration(200).easing(Easing.out(Easing.quad))}
+        layout={SequencedTransition.duration(200)}
+      >
+        <Header
+          style={styles.headerStaticStyle}
+          hasSeparator={true}
+          leftSideComponent={
+            <Info
+              picture={
+                <Avatar
+                  profilePictureUri={profilePictureUri}
+                  hasUnSeenStroy={hasUnSeenStroy}
+                  showOutline={hasUnSeenStroy}
+                />
+              }
+              pictureGapSize={SIZE_REF_6}
+            >
+              {(size, color) => (
+                <MediumText
+                  style={[
+                    {
+                      fontSize: size,
+                      lineHeight: size,
+                      color: color,
+                    },
+                  ]}
+                  ellipsizeMode="tail"
+                  numberOfLines={1}
+                >
+                  {socialId}
+                </MediumText>
+              )}
+            </Info>
+          }
+          rightSideComponent={<Icon name="more-solid" size={SIZE_REF_8 * 3} />}
+        />
+        <ImagePostBody
+          filteredLikes={filteredLikes}
+          noOfLikes={noOfLikes}
+          {...restProps}
+        />
+        <ImagePostControls hasLiked={hasLiked} hasSaved={hasSaved} />
+        {hashtags && (
           <FlatList
-            data={hashTagList}
+            data={hashtags}
             renderItem={renderItem}
             keyExtractor={keyExtractor}
             horizontal={true}
@@ -68,9 +140,8 @@ const ImagePost = React.memo<Id>(
         )}
       </Animated.View>
     );
-  },
-  (prveProps, nextProps) => prveProps.id === nextProps.id
-);
+  }
+}
 
 const styles = StyleSheet.create({
   rootContainerStaticStyle: {
@@ -82,18 +153,15 @@ const styles = StyleSheet.create({
   },
   listStaticStyle: {
     width: "100%",
-    height: SIZE_REF_12 + 2 * 0.47 * SIZE_REF_12,
-    marginTop: SIZE_REF_8,
+    height: SIZE_REF_12 + 2 * 0.47 * SIZE_REF_12 + 2 * SIZE_REF_8,
   },
   listContentContainerStyle: {
-    paddingHorizontal: SIZE_REF_8,
+    padding: SIZE_REF_8,
     alignItems: "center",
   },
   captionTextStaticStyle: {
     width: "100%",
-    paddingHorizontal: SIZE_REF_8,
-    marginTop: SIZE_REF_8,
+    padding: SIZE_REF_8,
   },
+  headerStaticStyle: { paddingVertical: SIZE_REF_8 },
 });
-
-export default ImagePost;

@@ -1,3 +1,4 @@
+import { BottomTabHeaderProps } from "@react-navigation/bottom-tabs";
 import { NavigatorScreenParams } from "@react-navigation/native";
 import { ReactElement, ReactNode } from "react";
 import { Animated, StyleProp, TextStyle, ViewStyle } from "react-native";
@@ -123,12 +124,19 @@ export interface CarosolProps {
 export interface HeaderProps {
   leftSideComponent?: ReactNode;
   rightSideComponent?: ReactNode;
+  hasSeparator?: boolean;
+  style?: StyleProp<ViewStyle>;
 }
 export interface ItemSeparatorProps {
   axis: "horizontal" | "vertical";
   length: number;
   style?: StyleProp<ViewStyle>;
 }
+
+export interface BottomTabScreenHeaderProps extends HeaderProps {
+  headerProps: BottomTabHeaderProps;
+}
+
 //--------------------------------------------------------------------------------------------------------------
 
 //----------------------------------------------response-types--------------------------------------------------
@@ -569,15 +577,15 @@ export interface CountListPair<T> {
   list?: T[];
 }
 
-export interface ImageConfig {
+export interface BoxUtil {
   width: number;
   height: number;
+}
+
+export interface ImageConfig extends BoxUtil {
   resizeMode: ResizeMode;
 }
-export interface ImagePostOverlayProps extends Id {
-  width: number;
-  height: number;
-}
+
 export interface Size {
   original: number;
   min: number;
@@ -629,9 +637,7 @@ export interface Link {
   uri: string;
   icon: string;
 }
-export interface MediaInfo {
-  width: number;
-  height: number;
+export interface MediaInfo extends BoxUtil {
   uri: string;
 }
 //--------------------------------------------------------------------------------------------------------
@@ -1139,3 +1145,63 @@ export interface FeedData<T> {
 //     list?: { id: BelongsTo<entities>; timestamp: number }[] | null;
 //   };
 // }
+
+export interface AccountShortResponse {
+  id: string;
+  socialId: string;
+  profilePictureUri: string;
+}
+
+export interface AccountMediumResponse extends AccountShortResponse {
+  username: string;
+  isFollowing: boolean;
+  hasUnSeenStroy: boolean;
+}
+
+export interface HashTagShortResponse {
+  id: string;
+  name: string;
+}
+
+export interface ImagePostResponse {
+  id: string;
+  timestamp: number;
+  author: AccountMediumResponse;
+  images: MediaInfo[];
+  caption: string | null;
+  genre: ImageGenre;
+  hasSaved: boolean;
+  likes: {
+    noOfLikes: number;
+    hasLiked: boolean;
+    filteredLikes: AccountShortResponse[] | null;
+  };
+  noOfComments: number;
+  noOfShares: number;
+  hashtags: HashTagShortResponse[] | null;
+  tags: AccountShortResponse[] | null;
+}
+
+export interface ImagePostOverlayProps extends BoxUtil {
+  noOfLikes: number;
+  noOfComments: number;
+  noOfShares: number;
+  filteredLikes: AccountShortResponse[] | null;
+  genre: ImageGenre;
+  tags: AccountShortResponse[] | null;
+}
+
+export interface ImagePostControlsProps {
+  hasLiked: boolean;
+  hasSaved: boolean;
+}
+
+export interface ImagePostBodyProps {
+  images: MediaInfo[];
+  noOfLikes: number;
+  noOfComments: number;
+  noOfShares: number;
+  filteredLikes: AccountShortResponse[] | null;
+  genre: ImageGenre;
+  tags: AccountShortResponse[] | null;
+}

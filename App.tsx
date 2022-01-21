@@ -8,17 +8,19 @@ import appStore from "./store/appStore";
 import RootStackNavigator from "./navigations/RootStackNavigator";
 import { createServer } from "miragejs";
 import {
-  ApiFactory,
-  ApiModel,
   ApiResponse,
   FeedData,
   FeedMeta,
-  ImagePostDetails,
+  ImagePostResponse,
 } from "./utility/types";
 import {
-  generateImagePostDetailsList,
+  generateImagePostResponseList,
   generateKeyWords,
 } from "./utility/helpers";
+import {
+  initialWindowMetrics,
+  SafeAreaProvider,
+} from "react-native-safe-area-context";
 
 enableScreens(true);
 
@@ -29,7 +31,7 @@ const server = createServer({
       const userId = request.queryParams["userid"];
       console.log(userId + " is requesting the image feed inital data");
 
-      const response: ApiResponse<FeedMeta, FeedData<ImagePostDetails>> = {
+      const response: ApiResponse<FeedMeta, FeedData<ImagePostResponse>> = {
         meta: {
           category: "feed",
           filter: { id: userId },
@@ -37,7 +39,7 @@ const server = createServer({
           page: { id: 0, length: 12, noOfPages: 1000, size: 12 },
           keywords: generateKeyWords(),
         },
-        data: { list: generateImagePostDetailsList(12) },
+        data: { list: generateImagePostResponseList(12) },
       };
 
       return response;
@@ -105,11 +107,13 @@ const App = () => {
   }
 
   return (
-    <Provider store={appStore}>
-      <NavigationContainer onReady={appReadyCallback}>
-        <RootStackNavigator />
-      </NavigationContainer>
-    </Provider>
+    <SafeAreaProvider initialMetrics={initialWindowMetrics}>
+      <Provider store={appStore}>
+        <NavigationContainer onReady={appReadyCallback}>
+          <RootStackNavigator />
+        </NavigationContainer>
+      </Provider>
+    </SafeAreaProvider>
   );
 };
 

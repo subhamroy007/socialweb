@@ -7,6 +7,7 @@ import ImageList from "../components/global/ImageList";
 import ItemSeparator from "../components/global/ItemSeparator";
 import LoadingIndicator from "../components/global/LoadingIndicator";
 import RoundedIcon from "../components/global/RoundedIcon";
+import ImagePost from "../components/imagePost/ImagePost";
 import { useGetImagePostFeedDataQuery } from "../store/imagePost/endpoint";
 
 import {
@@ -19,15 +20,27 @@ import {
 import { createKeyExtractor } from "../utility/helpers";
 
 import { globalColors, globalLayouts } from "../utility/styles";
+import { ImagePostResponse } from "../utility/types";
 
-const keyExtractor = createKeyExtractor("image-post");
+const imagePostListkeyExtractor = createKeyExtractor("image-post");
 
-const renderItem = (item: ListRenderItemInfo<string>) => {
+const keyWordListKeyExtractor = (item: string, index?: number) =>
+  item + "-" + index;
+
+const keywordsRenderItem = (item: ListRenderItemInfo<string>) => {
   return <HighlightedItem text={item.item} type="outline" />;
 };
 
-const itemSeparatorCallback = () => (
+const keywordsItemSeparatorCallback = () => (
   <ItemSeparator axis="vertical" length={SIZE_REF_8} />
+);
+
+const imagePostsRenderItem = (item: ListRenderItemInfo<ImagePostResponse>) => {
+  return <ImagePost {...item.item} />;
+};
+
+const imagePostsItemSeparatorCallback = () => (
+  <ItemSeparator axis="horizontal" length={SIZE_REF_16} />
 );
 
 const NewImageFeedScreen = () => {
@@ -38,7 +51,8 @@ const NewImageFeedScreen = () => {
     isSuccess,
     isUninitialized,
     error,
-    currentData,
+    keywords,
+    posts,
   } = useGetImagePostFeedDataQuery(
     { userId: "" },
     {
@@ -61,7 +75,8 @@ const NewImageFeedScreen = () => {
           isLoading,
           isSuccess,
           isUninitialized,
-          currentData: currentData?.meta.keywords,
+          keywords: currentData?.meta.keywords,
+          posts: currentData?.data.list,
           error,
         };
       },
@@ -73,9 +88,9 @@ const NewImageFeedScreen = () => {
       edges={["left", "right"]}
       style={[globalColors.screenColor, globalLayouts.screenLayout]}
     >
-      {(isUninitialized || isLoading) && (
+      {/* {(isUninitialized || isLoading) && (
         <LoadingIndicator size={SIZE_REF_10 * 5} color="#1F1F1F" />
-      )}
+      )} */}
       {isError && (
         <RoundedIcon
           name="chevron-down"
@@ -86,21 +101,27 @@ const NewImageFeedScreen = () => {
         />
       )}
       {isSuccess && (
-        <ImageList
-          headerComponent={
+        <FlatList
+          data={posts}
+          renderItem={imagePostsRenderItem}
+          keyExtractor={imagePostListkeyExtractor}
+          ItemSeparatorComponent={imagePostsItemSeparatorCallback}
+          ListHeaderComponent={
             <FlatList
-              data={currentData}
+              data={keywords}
               style={styles.suggestionListStaticStyle}
               contentContainerStyle={
                 styles.suggestionListContentContainerStaticStyle
               }
-              renderItem={renderItem}
-              keyExtractor={keyExtractor}
+              renderItem={keywordsRenderItem}
+              keyExtractor={keyWordListKeyExtractor}
               horizontal={true}
               showsHorizontalScrollIndicator={false}
-              ItemSeparatorComponent={itemSeparatorCallback}
+              ItemSeparatorComponent={keywordsItemSeparatorCallback}
             />
           }
+          style={styles.listStaticStyle}
+          showsVerticalScrollIndicator={false}
         />
       )}
     </SafeAreaView>
@@ -122,98 +143,10 @@ const styles = StyleSheet.create({
     borderWidth: StyleSheet.hairlineWidth,
     borderColor: "black",
   },
+  listStaticStyle: {
+    width: "100%",
+    flex: 1,
+  },
 });
 
 export default NewImageFeedScreen;
-
-// const dispatch = useAppDispatch();
-
-// const {
-//   error,
-//   ids,
-//   keywords,
-//   selectedKeyWord,
-//   state,
-//   selectedKeyWordDataState,
-// } = useAppSelector(selectImageFeedScreenData, shallowEqual);
-// useEffect(() => {
-//   dispatch(getImagePostFeedThunk());
-// }, [dispatch]);
-
-// const endReachCallback = useCallback(() => {
-//   dispatch(
-//     getImagePostDetailsThunk({
-//       category: "feed",
-//       filter: selectedKeyWord as string,
-//       initialRequest: false,
-//     })
-//   );
-// }, [selectedKeyWord]);
-
-// const renderItem = useCallback(
-//   (item: ListRenderItemInfo<string>) => {
-//     return (
-//       <KeyWord
-//         focused={item.item === selectedKeyWord}
-//         postType="imagePost"
-//         keyword={item.item}
-//       />
-//     );
-//   },
-//   [selectedKeyWord]
-// );
-
-// useEffect(() => {
-//   if (!selectedKeyWordDataState && selectedKeyWord !== "all") {
-//     dispatch(
-//       getImagePostDetailsThunk({
-//         category: "feed",
-//         filter: selectedKeyWord as string,
-//         initialRequest: true,
-//       })
-//     );
-//   }
-// }, [selectedKeyWord, selectedKeyWordDataState]);
-
-// return (
-//   <SafeAreaView
-//     edges={["left", "right"]}
-//     style={[globalLayouts.screenLayout, globalColors.screenColor]}
-//   >
-//     {(!state || state === "loading") && (
-//       <LoadingIndicator color="black" size={SIZE_REF_10 * 4} />
-//     )}
-//     {state === "failure" && (!ids || ids.length === 0) && (
-//       <RoundedIcon
-//         name="chevron-down"
-//         backgroundColor="transparent"
-//         scale={0.7}
-//         size={SIZE_REF_10 * 4}
-//         style={styles.retryIconStaticStyle}
-//       />
-//     )}
-//     {state === "success" && (
-//       <ImageList
-//         ids={ids}
-//         dataState={selectedKeyWordDataState}
-//         extraData={{ selectedKeyWord }}
-//         onEndReach={endReachCallback}
-//         headerComponent={
-//           <FlatList
-//             data={keywords}
-//             renderItem={renderItem}
-//             keyExtractor={keyExtractor}
-//             style={styles.suggestionListStaticStyle}
-//             contentContainerStyle={
-//               styles.suggestionListContentContainerStaticStyle
-//             }
-//             horizontal={true}
-//             showsHorizontalScrollIndicator={false}
-//             ItemSeparatorComponent={itemSeparatorCallback}
-//             extraData={selectedKeyWord}
-//           />
-//         }
-//       />
-//     )}
-//   </SafeAreaView>
-// );

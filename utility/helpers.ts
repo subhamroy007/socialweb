@@ -2,15 +2,19 @@ import {
   Account,
   AccountDetails,
   AccountInfo,
+  AccountMediumResponse,
+  AccountShortResponse,
   Comment,
   CommentInfo,
   HashTag,
   HashTagDetails,
   HashTagInfo,
+  HashTagShortResponse,
   ImageConfig,
   ImagePost,
   ImagePostDetails,
   ImagePostInfo,
+  ImagePostResponse,
   Link,
   MediaInfo,
   PageResponse,
@@ -48,7 +52,7 @@ export const getImageConfig = (
   if (containerHeight > maxHeight) {
     containerHeight = maxHeight;
   } else if (containerHeight < minHeight) {
-    containerHeight = minWidth;
+    containerHeight = minHeight;
   }
 
   let resizeMode: ResizeMode = "center";
@@ -284,41 +288,41 @@ export function generatePaginatedHashTagInfo(
   };
 }
 
-export function generateAccountInfo(): AccountInfo {
-  return {
-    id: "account@" + faker.datatype.uuid(),
-    followersCount: faker.datatype.number({ min: 0, max: 10000000 }),
-    isFollower: faker.datatype.boolean(),
-    isFollowing: faker.datatype.boolean(),
-    profilePictureUri: faker.image.imageUrl(),
-    socialId: faker.name.firstName(),
-    username: faker.name.findName(),
-  };
-}
+// export function generateAccountInfo(): AccountInfo {
+//   return {
+//     id: "account@" + faker.datatype.uuid(),
+//     followersCount: faker.datatype.number({ min: 0, max: 10000000 }),
+//     isFollower: faker.datatype.boolean(),
+//     isFollowing: faker.datatype.boolean(),
+//     profilePictureUri: faker.image.imageUrl(),
+//     socialId: faker.name.firstName(),
+//     username: faker.name.findName(),
+//   };
+// }
 
-export function generateAccountInfoList(
-  length: number = faker.datatype.number({ min: 4, max: 25 })
-): AccountInfo[] {
-  const list: AccountInfo[] = [];
+// export function generateAccountInfoList(
+//   length: number = faker.datatype.number({ min: 4, max: 25 })
+// ): AccountInfo[] {
+//   const list: AccountInfo[] = [];
 
-  for (let i = 0; i < length; i++) {
-    list.push(generateAccountInfo());
-  }
+//   for (let i = 0; i < length; i++) {
+//     list.push(generateAccountInfo());
+//   }
 
-  return list;
-}
+//   return list;
+// }
 
-export function generatePaginatedAccountInfo(
-  id: number = 0
-): PageResponse<AccountInfo> {
-  return {
-    id,
-    length: ACCOUNT_PAGE_SIZE,
-    noOfPages: 1000,
-    size: ACCOUNT_PAGE_SIZE,
-    list: generateAccountInfoList(ACCOUNT_PAGE_SIZE),
-  };
-}
+// export function generatePaginatedAccountInfo(
+//   id: number = 0
+// ): PageResponse<AccountInfo> {
+//   return {
+//     id,
+//     length: ACCOUNT_PAGE_SIZE,
+//     noOfPages: 1000,
+//     size: ACCOUNT_PAGE_SIZE,
+//     list: generateAccountInfoList(ACCOUNT_PAGE_SIZE),
+//   };
+// }
 
 export function generateMediaInfo(): MediaInfo {
   const height = faker.datatype.number({ max: 480, min: 144 });
@@ -341,177 +345,228 @@ export function generateMediaInfoList(length: number = 1): MediaInfo[] {
   return list;
 }
 
-export function generateImagePostInfo(): ImagePostInfo {
+export function generateAccountShortResponse(): AccountShortResponse {
   return {
-    author: generateAccountInfo(),
-    id: "imagePost@" + faker.datatype.uuid(),
-    images: generateMediaInfoList(faker.datatype.number({ min: 1, max: 12 })),
-    isLiked: faker.datatype.boolean(),
-    isSaved: faker.datatype.boolean(),
-    timestamp: faker.date.past(5, Date()).getMilliseconds(),
+    id: "account" + faker.datatype.uuid(),
+    profilePictureUri: faker.image.imageUrl(144, 144, undefined, true),
+    socialId: faker.name.firstName() + "@" + faker.name.lastName(),
   };
 }
 
-export function generateImagePostInfoList(
-  length: number = faker.datatype.number({ min: 4, max: 25 })
-): ImagePostInfo[] {
-  const list: ImagePostInfo[] = [];
+export function generateAccountMediumResponse(): AccountMediumResponse {
+  return {
+    ...generateAccountShortResponse(),
+    hasUnSeenStroy: faker.datatype.boolean(),
+    isFollowing: faker.datatype.boolean(),
+    username: faker.name.findName(),
+  };
+}
+
+export function generateAccountShortResponseList(
+  length: number = faker.datatype.number({ min: 1, max: 10 })
+): AccountShortResponse[] {
+  const list: AccountShortResponse[] = [];
 
   for (let i = 0; i < length; i++) {
-    list.push(generateImagePostInfo());
+    list.push(generateAccountShortResponse());
   }
 
   return list;
 }
 
-export function generatePaginatedImagePostInfo(
-  id: number = 0
-): PageResponse<ImagePostInfo> {
+export function generateHashTagShortResponse(): HashTagShortResponse {
   return {
-    id,
-    length: IMAGE_POST_INFO_PAGE_SIZE,
-    noOfPages: 1000,
-    size: IMAGE_POST_INFO_PAGE_SIZE,
-    list: generateImagePostInfoList(IMAGE_POST_INFO_PAGE_SIZE),
+    id: "hashtag" + faker.datatype.uuid(),
+    name: faker.lorem.word(faker.datatype.number({ min: 3, max: 16 })),
   };
 }
 
-export function generateImagePostDetails(): ImagePostDetails {
+export function generateHashTagShortResponseList(
+  length: number = faker.datatype.number({ min: 1, max: 10 })
+): HashTagShortResponse[] {
+  const list: HashTagShortResponse[] = [];
+
+  for (let i = 0; i < length; i++) {
+    list.push(generateHashTagShortResponse());
+  }
+
+  return list;
+}
+
+// export function generateImagePostInfo(): ImagePostInfo {
+//   return {
+//     author: generateAccountInfo(),
+//     id: "imagePost@" + faker.datatype.uuid(),
+//     images: generateMediaInfoList(faker.datatype.number({ min: 1, max: 12 })),
+//     isLiked: faker.datatype.boolean(),
+//     isSaved: faker.datatype.boolean(),
+//     timestamp: faker.date.past(5, Date()).getMilliseconds(),
+//   };
+// }
+
+// export function generateImagePostInfoList(
+//   length: number = faker.datatype.number({ min: 4, max: 25 })
+// ): ImagePostInfo[] {
+//   const list: ImagePostInfo[] = [];
+
+//   for (let i = 0; i < length; i++) {
+//     list.push(generateImagePostInfo());
+//   }
+
+//   return list;
+// }
+
+// export function generatePaginatedImagePostInfo(
+//   id: number = 0
+// ): PageResponse<ImagePostInfo> {
+//   return {
+//     id,
+//     length: IMAGE_POST_INFO_PAGE_SIZE,
+//     noOfPages: 1000,
+//     size: IMAGE_POST_INFO_PAGE_SIZE,
+//     list: generateImagePostInfoList(IMAGE_POST_INFO_PAGE_SIZE),
+//   };
+// }
+
+export function generateImagePostResponse(): ImagePostResponse {
   return {
-    author: generateAccountInfo(),
-    commentsCount: faker.datatype.number({ max: 100000, min: 0 }),
+    author: generateAccountMediumResponse(),
+    noOfComments: faker.datatype.number({ max: 100000, min: 0 }),
     genre: "food",
     id: "imagePost@" + faker.datatype.uuid(),
     images: generateMediaInfoList(faker.datatype.number({ min: 1, max: 12 })),
-    isSaved: faker.datatype.boolean(),
+    hasSaved: faker.datatype.boolean(),
     likes: {
-      isLiked: faker.datatype.boolean(),
-      likesCount: faker.datatype.number({ max: 1000000, min: 0 }),
-      filteredLikes: faker.datatype.boolean()
-        ? generateAccountInfoList(faker.datatype.number({ min: 0, max: 2 }))
-        : null,
+      hasLiked: faker.datatype.boolean(),
+      noOfLikes: faker.datatype.number({ max: 1000000, min: 0 }),
+      filteredLikes:
+        Math.random() > 0.3
+          ? generateAccountShortResponseList(
+              faker.datatype.number({ min: 1, max: 2 })
+            )
+          : null,
     },
-    sharesCount: faker.datatype.number({ max: 10000, min: 0 }),
+    noOfShares: faker.datatype.number({ max: 10000, min: 0 }),
     timestamp: faker.date.past(5, Date()).getMilliseconds(),
     caption: faker.datatype.boolean()
       ? faker.lorem.words(faker.datatype.number({ min: 1, max: 15 }))
       : null,
-    hashtags: faker.datatype.boolean() ? generateHashTagInfoList() : null,
-    tags: faker.datatype.boolean() ? generateAccountInfoList() : null,
+    hashtags: Math.random() > 0.3 ? generateHashTagShortResponseList() : null,
+    tags: Math.random() > 0.3 ? generateAccountShortResponseList() : null,
   };
 }
 
-export function generateImagePostDetailsList(
+export function generateImagePostResponseList(
   length: number = faker.datatype.number({ min: 4, max: 25 })
-): ImagePostDetails[] {
-  const list: ImagePostDetails[] = [];
+): ImagePostResponse[] {
+  const list: ImagePostResponse[] = [];
 
   for (let i = 0; i < length; i++) {
-    list.push(generateImagePostDetails());
+    list.push(generateImagePostResponse());
   }
 
   return list;
 }
 
-export function generatePaginatedImagePostDetails(
-  id: number = 0
-): PageResponse<ImagePostDetails> {
-  return {
-    id,
-    length: IMAGE_POST_DETAILS_PAGE_SIZE,
-    noOfPages: 1000,
-    size: IMAGE_POST_DETAILS_PAGE_SIZE,
-    list: generateImagePostDetailsList(IMAGE_POST_DETAILS_PAGE_SIZE),
-  };
-}
+// export function generatePaginatedImagePostDetails(
+//   id: number = 0
+// ): PageResponse<ImagePostDetails> {
+//   return {
+//     id,
+//     length: IMAGE_POST_DETAILS_PAGE_SIZE,
+//     noOfPages: 1000,
+//     size: IMAGE_POST_DETAILS_PAGE_SIZE,
+//     list: generateImagePostDetailsList(IMAGE_POST_DETAILS_PAGE_SIZE),
+//   };
+// }
 
-export function generateVideoPostInfo(): VideoPostInfo {
-  const duration = faker.datatype.number({
-    min: 30000,
-    max: 120 * 60 * 1000,
-  });
+// export function generateVideoPostInfo(): VideoPostInfo {
+//   const duration = faker.datatype.number({
+//     min: 30000,
+//     max: 120 * 60 * 1000,
+//   });
 
-  return {
-    author: generateAccountInfo(),
-    duration,
-    id: "videoPost@" + faker.datatype.uuid(),
-    likesCount: faker.datatype.number({ min: 0, max: 100000 }),
-    thumbnail: generateMediaInfo(),
-    timestamp: faker.date.past(5, Date()).getMilliseconds(),
-    title: faker.lorem.words(faker.datatype.number({ max: 16, min: 1 })),
-    viewsCount: faker.datatype.number({ min: 0, max: 10000000 }),
-    watchTime: faker.datatype.boolean()
-      ? Math.floor(duration * Math.random())
-      : null,
-  };
-}
+//   return {
+//     author: generateAccountInfo(),
+//     duration,
+//     id: "videoPost@" + faker.datatype.uuid(),
+//     likesCount: faker.datatype.number({ min: 0, max: 100000 }),
+//     thumbnail: generateMediaInfo(),
+//     timestamp: faker.date.past(5, Date()).getMilliseconds(),
+//     title: faker.lorem.words(faker.datatype.number({ max: 16, min: 1 })),
+//     viewsCount: faker.datatype.number({ min: 0, max: 10000000 }),
+//     watchTime: faker.datatype.boolean()
+//       ? Math.floor(duration * Math.random())
+//       : null,
+//   };
+// }
 
-export function generateVideoPostInfoList(
-  length: number = faker.datatype.number({ min: 4, max: 25 })
-): VideoPostInfo[] {
-  const list: VideoPostInfo[] = [];
+// export function generateVideoPostInfoList(
+//   length: number = faker.datatype.number({ min: 4, max: 25 })
+// ): VideoPostInfo[] {
+//   const list: VideoPostInfo[] = [];
 
-  for (let i = 0; i < length; i++) {
-    list.push(generateVideoPostInfo());
-  }
+//   for (let i = 0; i < length; i++) {
+//     list.push(generateVideoPostInfo());
+//   }
 
-  return list;
-}
+//   return list;
+// }
 
-export function generatePaginatedVideoPostInfo(
-  id: number = 0
-): PageResponse<VideoPostInfo> {
-  return {
-    id,
-    length: VIDEO_POST_INFO_PAGE_SIZE,
-    noOfPages: 1000,
-    size: VIDEO_POST_INFO_PAGE_SIZE,
-    list: generateVideoPostInfoList(VIDEO_POST_INFO_PAGE_SIZE),
-  };
-}
+// export function generatePaginatedVideoPostInfo(
+//   id: number = 0
+// ): PageResponse<VideoPostInfo> {
+//   return {
+//     id,
+//     length: VIDEO_POST_INFO_PAGE_SIZE,
+//     noOfPages: 1000,
+//     size: VIDEO_POST_INFO_PAGE_SIZE,
+//     list: generateVideoPostInfoList(VIDEO_POST_INFO_PAGE_SIZE),
+//   };
+// }
 
-export function genererateVideoPostDetails(): VideoPostDetails {
-  const duration = faker.datatype.number({
-    min: 30000,
-    max: 120 * 60 * 1000,
-  });
-  const media = generateMediaInfo();
-  media.uri = "http://d23dyxeqlo5psv.cloudfront.net/big_buck_bunny.mp4";
-  return {
-    author: generateAccountInfo(),
-    duration,
-    id: "videoPost@" + faker.datatype.uuid(),
-    thumbnail: generateMediaInfo(),
-    timestamp: faker.date.past(5, Date()).getMilliseconds(),
-    title: faker.lorem.words(faker.datatype.number({ max: 16, min: 1 })),
-    viewsCount: faker.datatype.number({ min: 0, max: 10000000 }),
-    watchTime: faker.datatype.boolean()
-      ? Math.floor(duration * Math.random())
-      : null,
-    commentsCount: faker.datatype.number({ max: 10000, min: 0 }),
-    genre: "comedy",
-    isSaved: faker.datatype.boolean(),
-    likes: {
-      isLiked: faker.datatype.boolean(),
-      likesCount: faker.datatype.number({ max: 100000, min: 0 }),
-      filteredLikes: faker.datatype.boolean()
-        ? generateAccountInfoList(faker.datatype.number({ min: 0, max: 2 }))
-        : null,
-    },
-    sharesCount: faker.datatype.number({ max: 10000, min: 0 }),
-    description: faker.datatype.boolean()
-      ? faker.lorem.words(faker.datatype.number({ min: 1, max: 100 }))
-      : null,
-    hashtags: faker.datatype.boolean() ? generateHashTagInfoList() : null,
-    tags: faker.datatype.boolean() ? generateAccountInfoList() : null,
-    video: {
-      media,
-      credit: faker.datatype.boolean() ? 24000 : null,
-      intro: faker.datatype.boolean() ? [10000, 16000] : null,
-      recap: faker.datatype.boolean() ? [0, 9000] : null,
-    },
-  };
-}
+// export function genererateVideoPostDetails(): VideoPostDetails {
+//   const duration = faker.datatype.number({
+//     min: 30000,
+//     max: 120 * 60 * 1000,
+//   });
+//   const media = generateMediaInfo();
+//   media.uri = "http://d23dyxeqlo5psv.cloudfront.net/big_buck_bunny.mp4";
+//   return {
+//     author: generateAccountInfo(),
+//     duration,
+//     id: "videoPost@" + faker.datatype.uuid(),
+//     thumbnail: generateMediaInfo(),
+//     timestamp: faker.date.past(5, Date()).getMilliseconds(),
+//     title: faker.lorem.words(faker.datatype.number({ max: 16, min: 1 })),
+//     viewsCount: faker.datatype.number({ min: 0, max: 10000000 }),
+//     watchTime: faker.datatype.boolean()
+//       ? Math.floor(duration * Math.random())
+//       : null,
+//     commentsCount: faker.datatype.number({ max: 10000, min: 0 }),
+//     genre: "comedy",
+//     isSaved: faker.datatype.boolean(),
+//     likes: {
+//       isLiked: faker.datatype.boolean(),
+//       likesCount: faker.datatype.number({ max: 100000, min: 0 }),
+//       filteredLikes: faker.datatype.boolean()
+//         ? generateAccountInfoList(faker.datatype.number({ min: 0, max: 2 }))
+//         : null,
+//     },
+//     sharesCount: faker.datatype.number({ max: 10000, min: 0 }),
+//     description: faker.datatype.boolean()
+//       ? faker.lorem.words(faker.datatype.number({ min: 1, max: 100 }))
+//       : null,
+//     hashtags: faker.datatype.boolean() ? generateHashTagInfoList() : null,
+//     tags: faker.datatype.boolean() ? generateAccountInfoList() : null,
+//     video: {
+//       media,
+//       credit: faker.datatype.boolean() ? 24000 : null,
+//       intro: faker.datatype.boolean() ? [10000, 16000] : null,
+//       recap: faker.datatype.boolean() ? [0, 9000] : null,
+//     },
+//   };
+// }
 
 export function generateLink(): Link {
   return {
@@ -533,102 +588,102 @@ export function generateLinkList(
   return list;
 }
 
-export function generateAccountDetails(): AccountDetails {
-  return {
-    followers: {
-      followersCount: faker.datatype.number({ min: 0, max: 10000000 }),
-      isFollower: faker.datatype.boolean(),
-      filteredFollowers: faker.datatype.boolean()
-        ? generateAccountInfoList(faker.datatype.number({ min: 0, max: 2 }))
-        : null,
-    },
-    followings: {
-      followingsCount: faker.datatype.number({ min: 0, max: 1000 }),
-      isFollowing: faker.datatype.boolean(),
-    },
-    id: "account@" + faker.datatype.uuid(),
-    profilePictureUri: faker.image.imageUrl(),
-    socialId: faker.name.firstName(),
-    uploads: {
-      uploadsCount: faker.datatype.number({ min: 0, max: 1000 }),
-      imagePosts: faker.datatype.boolean()
-        ? {
-            category: "user/uploads",
-            filter: "",
-            recentTimestamp: 0,
-            ...generatePaginatedImagePostDetails(),
-          }
-        : null,
-      videoPosts: faker.datatype.boolean()
-        ? {
-            category: "user/uploads",
-            filter: "",
-            recentTimestamp: 0,
-            ...generatePaginatedVideoPostInfo(),
-          }
-        : null,
-    },
-    username: faker.name.findName(),
-    bio: faker.datatype.boolean()
-      ? faker.lorem.words(faker.datatype.number({ min: 1, max: 30 }))
-      : null,
-    links: faker.datatype.boolean() ? generateLinkList() : null,
-  };
-}
+// export function generateAccountDetails(): AccountDetails {
+//   return {
+//     followers: {
+//       followersCount: faker.datatype.number({ min: 0, max: 10000000 }),
+//       isFollower: faker.datatype.boolean(),
+//       filteredFollowers: faker.datatype.boolean()
+//         ? generateAccountInfoList(faker.datatype.number({ min: 0, max: 2 }))
+//         : null,
+//     },
+//     followings: {
+//       followingsCount: faker.datatype.number({ min: 0, max: 1000 }),
+//       isFollowing: faker.datatype.boolean(),
+//     },
+//     id: "account@" + faker.datatype.uuid(),
+//     profilePictureUri: faker.image.imageUrl(),
+//     socialId: faker.name.firstName(),
+//     uploads: {
+//       uploadsCount: faker.datatype.number({ min: 0, max: 1000 }),
+//       imagePosts: faker.datatype.boolean()
+//         ? {
+//             category: "user/uploads",
+//             filter: "",
+//             recentTimestamp: 0,
+//             ...generatePaginatedImagePostDetails(),
+//           }
+//         : null,
+//       videoPosts: faker.datatype.boolean()
+//         ? {
+//             category: "user/uploads",
+//             filter: "",
+//             recentTimestamp: 0,
+//             ...generatePaginatedVideoPostInfo(),
+//           }
+//         : null,
+//     },
+//     username: faker.name.findName(),
+//     bio: faker.datatype.boolean()
+//       ? faker.lorem.words(faker.datatype.number({ min: 1, max: 30 }))
+//       : null,
+//     links: faker.datatype.boolean() ? generateLinkList() : null,
+//   };
+// }
 
-export function generateHashTagDetails(): HashTagDetails {
-  return {
-    id: "hashtag@" + faker.datatype.uuid(),
-    name: faker.lorem.word(faker.datatype.number({ max: 10, min: 3 })),
-    saves: {
-      isSaved: faker.datatype.boolean(),
-      savesCount: faker.datatype.number({ min: 1, max: 10000000 }),
-    },
-    uploads: {
-      uploadsCount: faker.datatype.number({ min: 1, max: 10000 }),
-      imagePosts: faker.datatype.boolean()
-        ? {
-            category: "hashtag/uploads",
-            filter: "",
-            recentTimestamp: 0,
-            ...generatePaginatedImagePostDetails(),
-          }
-        : null,
-      videoPosts: faker.datatype.boolean()
-        ? {
-            category: "hashtag/uploads",
-            filter: "",
-            recentTimestamp: 0,
-            ...generatePaginatedVideoPostInfo(),
-          }
-        : null,
-    },
-  };
-}
+// export function generateHashTagDetails(): HashTagDetails {
+//   return {
+//     id: "hashtag@" + faker.datatype.uuid(),
+//     name: faker.lorem.word(faker.datatype.number({ max: 10, min: 3 })),
+//     saves: {
+//       isSaved: faker.datatype.boolean(),
+//       savesCount: faker.datatype.number({ min: 1, max: 10000000 }),
+//     },
+//     uploads: {
+//       uploadsCount: faker.datatype.number({ min: 1, max: 10000 }),
+//       imagePosts: faker.datatype.boolean()
+//         ? {
+//             category: "hashtag/uploads",
+//             filter: "",
+//             recentTimestamp: 0,
+//             ...generatePaginatedImagePostDetails(),
+//           }
+//         : null,
+//       videoPosts: faker.datatype.boolean()
+//         ? {
+//             category: "hashtag/uploads",
+//             filter: "",
+//             recentTimestamp: 0,
+//             ...generatePaginatedVideoPostInfo(),
+//           }
+//         : null,
+//     },
+//   };
+// }
 
-export function generateVideoPostPreviewInfo(): VideoPostPreviewInfo {
-  const media = generateMediaInfo();
-  media.uri = "http://d23dyxeqlo5psv.cloudfront.net/big_buck_bunny.mp4";
+// export function generateVideoPostPreviewInfo(): VideoPostPreviewInfo {
+//   const media = generateMediaInfo();
+//   media.uri = "http://d23dyxeqlo5psv.cloudfront.net/big_buck_bunny.mp4";
 
-  return {
-    author: generateAccountInfo(),
-    id: "videoPost@" + faker.datatype.uuid(),
-    thumbnail: generateMediaInfo(),
-    timestamp: faker.date.past(5, Date()).getMilliseconds(),
-    title: faker.lorem.words(faker.datatype.number({ max: 16, min: 1 })),
-    viewsCount: faker.datatype.number({ min: 0, max: 10000000 }),
-    genre: "comedy",
-    isSaved: faker.datatype.boolean(),
-    description: faker.datatype.boolean()
-      ? faker.lorem.words(faker.datatype.number({ min: 1, max: 100 }))
-      : null,
-    likesCount: faker.datatype.number({ min: 0, max: 10000 }),
-    preview: {
-      media,
-      slice: faker.datatype.boolean() ? [0, 10] : null,
-    },
-  };
-}
+//   return {
+//     author: generateAccountInfo(),
+//     id: "videoPost@" + faker.datatype.uuid(),
+//     thumbnail: generateMediaInfo(),
+//     timestamp: faker.date.past(5, Date()).getMilliseconds(),
+//     title: faker.lorem.words(faker.datatype.number({ max: 16, min: 1 })),
+//     viewsCount: faker.datatype.number({ min: 0, max: 10000000 }),
+//     genre: "comedy",
+//     isSaved: faker.datatype.boolean(),
+//     description: faker.datatype.boolean()
+//       ? faker.lorem.words(faker.datatype.number({ min: 1, max: 100 }))
+//       : null,
+//     likesCount: faker.datatype.number({ min: 0, max: 10000 }),
+//     preview: {
+//       media,
+//       slice: faker.datatype.boolean() ? [0, 10] : null,
+//     },
+//   };
+// }
 
 export function generateKeyWords(): string[] {
   const list: string[] = [];
@@ -640,72 +695,72 @@ export function generateKeyWords(): string[] {
   return list;
 }
 
-export function generateCommentInfo(): CommentInfo {
-  return {
-    author: generateAccountInfo(),
-    content: faker.lorem.words(faker.datatype.number({ min: 3, max: 100 })),
-    id: "comment@" + faker.datatype.uuid(),
-    isLiked: faker.datatype.boolean(),
-    likesCount: faker.datatype.number({ min: 0, max: 10000 }),
-    repliesCount: faker.datatype.number({ min: 0, max: 10000 }),
-    timestamp: faker.date.past(2, Date()).getMilliseconds(),
-  };
-}
+// export function generateCommentInfo(): CommentInfo {
+//   return {
+//     author: generateAccountInfo(),
+//     content: faker.lorem.words(faker.datatype.number({ min: 3, max: 100 })),
+//     id: "comment@" + faker.datatype.uuid(),
+//     isLiked: faker.datatype.boolean(),
+//     likesCount: faker.datatype.number({ min: 0, max: 10000 }),
+//     repliesCount: faker.datatype.number({ min: 0, max: 10000 }),
+//     timestamp: faker.date.past(2, Date()).getMilliseconds(),
+//   };
+// }
 
-export function generateCommentInfoList(length: number = 10): CommentInfo[] {
-  const list: CommentInfo[] = [];
+// export function generateCommentInfoList(length: number = 10): CommentInfo[] {
+//   const list: CommentInfo[] = [];
 
-  for (let i = 0; i < length; i++) {
-    list.push(generateCommentInfo());
-  }
+//   for (let i = 0; i < length; i++) {
+//     list.push(generateCommentInfo());
+//   }
 
-  return list;
-}
+//   return list;
+// }
 
-export function generatePaginatedCommentInfo(
-  pageId: number = 0
-): PageResponse<CommentInfo> {
-  return {
-    id: pageId,
-    length: 10,
-    size: 10,
-    noOfPages: 1000,
-    list: generateCommentInfoList(),
-  };
-}
+// export function generatePaginatedCommentInfo(
+//   pageId: number = 0
+// ): PageResponse<CommentInfo> {
+//   return {
+//     id: pageId,
+//     length: 10,
+//     size: 10,
+//     noOfPages: 1000,
+//     list: generateCommentInfoList(),
+//   };
+// }
 
-export function generateReplyInfo(): ReplyInfo {
-  return {
-    author: generateAccountInfo(),
-    content: faker.lorem.words(faker.datatype.number({ min: 3, max: 100 })),
-    id: "comment@" + faker.datatype.uuid(),
-    isLiked: faker.datatype.boolean(),
-    likesCount: faker.datatype.number({ min: 0, max: 10000 }),
-    timestamp: faker.date.past(2, Date()).getMilliseconds(),
-  };
-}
+// export function generateReplyInfo(): ReplyInfo {
+//   return {
+//     author: generateAccountInfo(),
+//     content: faker.lorem.words(faker.datatype.number({ min: 3, max: 100 })),
+//     id: "comment@" + faker.datatype.uuid(),
+//     isLiked: faker.datatype.boolean(),
+//     likesCount: faker.datatype.number({ min: 0, max: 10000 }),
+//     timestamp: faker.date.past(2, Date()).getMilliseconds(),
+//   };
+// }
 
-export function generateReplyInfoList(length: number = 10): ReplyInfo[] {
-  const list: ReplyInfo[] = [];
+// export function generateReplyInfoList(length: number = 10): ReplyInfo[] {
+//   const list: ReplyInfo[] = [];
 
-  for (let i = 0; i < length; i++) {
-    list.push(generateReplyInfo());
-  }
+//   for (let i = 0; i < length; i++) {
+//     list.push(generateReplyInfo());
+//   }
 
-  return list;
-}
+//   return list;
+// }
 
-export function generatePaginatedReplyInfo(
-  pageId: number = 0
-): PageResponse<ReplyInfo> {
-  return {
-    id: pageId,
-    length: 10,
-    size: 10,
-    noOfPages: 1000,
-    list: generateReplyInfoList(),
-  };
-}
+// export function generatePaginatedReplyInfo(
+//   pageId: number = 0
+// ): PageResponse<ReplyInfo> {
+//   return {
+//     id: pageId,
+//     length: 10,
+//     size: 10,
+//     noOfPages: 1000,
+//     list: generateReplyInfoList(),
+//   };
+// }
 
 //------------------------------------------------------------------------------------------------------------
 

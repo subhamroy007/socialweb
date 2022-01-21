@@ -1,37 +1,15 @@
-import React, { useCallback, useMemo } from "react";
+import React from "react";
 import { StyleSheet, View, ViewProps } from "react-native";
-import FastImage, { Source } from "react-native-fast-image";
-import { RootState, useAppSelector } from "../../store/appStore";
-import {
-  selectUserProfilePictureUrl,
-  selectUserSocialId,
-} from "../../store/user/selector";
-import {
-  SIZE_REF_10,
-  SIZE_REF_12,
-  SIZE_REF_16,
-  SIZE_REF_4,
-} from "../../utility/constants";
+import FastImage from "react-native-fast-image";
+import { SIZE_REF_12, SIZE_REF_16, SIZE_REF_4 } from "../../utility/constants";
+import { AccountShortResponse } from "../../utility/types";
 import { RegularText } from "../../utility/ui";
 
-export interface TagProp {
-  id: string;
+export interface TagProp extends AccountShortResponse {
   style?: ViewProps["style"];
 }
 
-const Tag = ({ id, style }: TagProp) => {
-  const immutableDataSelectorCallback = useCallback(
-    (state: RootState) => {
-      const socialId = selectUserSocialId(state, id);
-      const profilePictureUri = selectUserProfilePictureUrl(state, id);
-      return { socialId, profilePictureUri };
-    },
-    [id]
-  );
-
-  const { profilePictureUri, socialId } = useAppSelector(
-    immutableDataSelectorCallback
-  );
+const Tag = ({ id, style, profilePictureUri, socialId }: TagProp) => {
   return (
     <View style={[style, styles.rootContainerStaticStyle]}>
       <FastImage

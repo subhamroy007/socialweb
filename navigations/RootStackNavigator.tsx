@@ -1,6 +1,5 @@
 import { createStackNavigator } from "@react-navigation/stack";
 import React from "react";
-import { MetaScreenHeader } from "../components/global/headers";
 import LiveScreen from "../screens/LiveScreen";
 import OverlayScreen from "../screens/OverlayScreen";
 import StoryFeedScreen from "../screens/StoryFeedScreen";
@@ -49,7 +48,7 @@ const RootStackNavigator = () => {
         name="PostEngagementStack"
         component={PostEngagementNavigator}
         options={{
-          header: (props) => <MetaScreenHeader {...props} />,
+          // header: (props) => <MetaScreenHeader {...props} />,
           headerShown: true,
           headerTitle: "Comments",
         }}

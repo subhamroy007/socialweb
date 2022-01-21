@@ -2,6 +2,7 @@ import React, { useEffect } from "react";
 import { StyleProp, StyleSheet, View, ViewStyle } from "react-native";
 import Animated, {
   Easing,
+  FadeOut,
   useAnimatedStyle,
   useSharedValue,
   withRepeat,
@@ -25,7 +26,7 @@ const LoadingIndicator = ({ size, color, style }: LoadingIndicatorProps) => {
 
   const rootContainerDynamicStyle = useAnimatedStyle(() => {
     return {
-      transform: [{ rotateZ: animatedValue.value + "deg" }],
+      transform: [{ rotate: animatedValue.value + "deg" }],
     };
   });
 
@@ -33,15 +34,18 @@ const LoadingIndicator = ({ size, color, style }: LoadingIndicatorProps) => {
     animatedValue.value = withRepeat(
       withTiming(360, {
         duration: 400,
-        easing: Easing.in(Easing.quad),
+        easing: Easing.inOut(Easing.linear),
       }),
-      1000,
+      400,
       false
     );
   }, []);
 
   return (
-    <Animated.View style={[style, rootContainerDynamicStyle]}>
+    <Animated.View
+      style={[style, rootContainerDynamicStyle]}
+      exiting={FadeOut.duration(200).easing(Easing.out(Easing.quad))}
+    >
       <Icon color={calculatedColor} name="loading" size={calculatedSize} />
     </Animated.View>
   );

@@ -1,16 +1,11 @@
-import React, { useCallback } from "react";
+import React from "react";
 import { StyleSheet, View } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
-import Animated from "react-native-reanimated";
-import { shallowEqual } from "react-redux";
-import { RootState, useAppSelector } from "../../store/appStore";
-import { selectImagePostOverlayData } from "../../store/imagePost/selectors";
+import Animated, { Easing, FadeIn, FadeOut } from "react-native-reanimated";
 import {
   SIZE_REF_1,
   SIZE_REF_12,
-  SIZE_REF_14,
   SIZE_REF_16,
-  SIZE_REF_4,
   SIZE_REF_6,
   SIZE_REF_8,
 } from "../../utility/constants";
@@ -21,120 +16,111 @@ import HighlightedItem from "../global/HighlightedItem";
 import RoundedIcon from "../global/RoundedIcon";
 import Tag from "../global/Tag";
 
-const ImagePostOverlay = ({ width, height, id }: ImagePostOverlayProps) => {
-  const mutableDataSelectorCallback = useCallback(
-    (state: RootState) => {
-      return selectImagePostOverlayData(state, id);
-    },
-    [id]
-  );
-
-  const mutableData = useAppSelector(mutableDataSelectorCallback, shallowEqual);
+const ImagePostOverlay = ({
+  width,
+  height,
+  filteredLikes,
+  genre,
+  noOfComments,
+  noOfLikes,
+  noOfShares,
+  tags,
+}: ImagePostOverlayProps) => {
   return (
-    <Animated.View style={[styles.rootContainerStaticStyle, { width, height }]}>
-      {mutableData && (
-        <ScrollView
-          horizontal={true}
-          showsHorizontalScrollIndicator={false}
-          style={styles.rootListStaticStyle}
-          pagingEnabled={true}
-        >
-          <View
-            style={[styles.metaDataContainerStaticStyle, { width, height }]}
-          >
-            <View style={styles.countsContainerStaticStyle}>
-              <View style={styles.iconCountPairContainerStaticStyle}>
-                <RoundedIcon
-                  name="heart-solid"
-                  backgroundColor="transparent"
-                  color="white"
-                  scale={0.7}
-                  size={SIZE_REF_8 * 7}
-                  style={{
-                    borderWidth: StyleSheet.hairlineWidth,
-                    borderColor: "white",
-                  }}
-                />
-                <MediumText style={styles.countTextStaticStyle}>
-                  {countAbbreviator(mutableData.counts.likesCount)}
-                </MediumText>
-              </View>
-              <View style={styles.iconCountPairContainerStaticStyle}>
-                <RoundedIcon
-                  name="comment-solid"
-                  backgroundColor="transparent"
-                  color="white"
-                  scale={0.7}
-                  size={SIZE_REF_8 * 7}
-                  style={{
-                    borderWidth: StyleSheet.hairlineWidth,
-                    borderColor: "white",
-                  }}
-                />
-                <MediumText style={styles.countTextStaticStyle}>
-                  {countAbbreviator(mutableData.counts.commentsCount)}
-                </MediumText>
-              </View>
-              <View style={styles.iconCountPairContainerStaticStyle}>
-                <RoundedIcon
-                  name="send"
-                  backgroundColor="transparent"
-                  color="white"
-                  scale={0.7}
-                  size={SIZE_REF_8 * 7}
-                  style={{
-                    borderWidth: StyleSheet.hairlineWidth,
-                    borderColor: "white",
-                  }}
-                />
-                <MediumText style={styles.countTextStaticStyle}>
-                  {countAbbreviator(mutableData.counts.sharesCount)}
-                </MediumText>
-              </View>
+    <Animated.View
+      style={[styles.rootContainerStaticStyle, { width, height }]}
+      entering={FadeIn.duration(200).easing(Easing.in(Easing.quad))}
+      exiting={FadeOut.duration(200).easing(Easing.out(Easing.quad))}
+    >
+      <ScrollView
+        horizontal={true}
+        showsHorizontalScrollIndicator={false}
+        style={styles.listStaticStyle}
+        pagingEnabled={true}
+      >
+        <View style={[styles.metaDataContainerStaticStyle, { width, height }]}>
+          <View style={styles.countsContainerStaticStyle}>
+            <View style={styles.iconCountPairContainerStaticStyle}>
+              <RoundedIcon
+                name="heart-solid"
+                backgroundColor="transparent"
+                color="white"
+                scale={0.7}
+                size={SIZE_REF_8 * 7}
+                style={{
+                  borderWidth: StyleSheet.hairlineWidth,
+                  borderColor: "white",
+                }}
+              />
+              <MediumText style={styles.countTextStaticStyle}>
+                {countAbbreviator(noOfLikes)}
+              </MediumText>
             </View>
-            {mutableData.likedBy && mutableData.likedBy.length > 0 && (
-              <RegularText style={styles.likeTextStaticStyle}>
-                liked by{" "}
-                <MediumText>{mutableData.likedBy[0].socialId}</MediumText>
-                {mutableData.likedBy.length > 1 && (
-                  <RegularText>
-                    {" "}
-                    and{" "}
-                    <MediumText>{mutableData.likedBy[1].socialId}</MediumText>
-                  </RegularText>
-                )}
-              </RegularText>
-            )}
-            <HighlightedItem
-              text={mutableData.genre}
-              type="solid"
-              color="white"
-              size={SIZE_REF_12 + SIZE_REF_1}
-              backgroundColor="#292828"
-              style={{
-                position: "absolute",
-                top: SIZE_REF_8,
-                left: SIZE_REF_8,
-              }}
-            />
+            <View style={styles.iconCountPairContainerStaticStyle}>
+              <RoundedIcon
+                name="comment-solid"
+                backgroundColor="transparent"
+                color="white"
+                scale={0.7}
+                size={SIZE_REF_8 * 7}
+                style={{
+                  borderWidth: StyleSheet.hairlineWidth,
+                  borderColor: "white",
+                }}
+              />
+              <MediumText style={styles.countTextStaticStyle}>
+                {countAbbreviator(noOfComments)}
+              </MediumText>
+            </View>
+            <View style={styles.iconCountPairContainerStaticStyle}>
+              <RoundedIcon
+                name="send"
+                backgroundColor="transparent"
+                color="white"
+                scale={0.7}
+                size={SIZE_REF_8 * 7}
+                style={{
+                  borderWidth: StyleSheet.hairlineWidth,
+                  borderColor: "white",
+                }}
+              />
+              <MediumText style={styles.countTextStaticStyle}>
+                {countAbbreviator(noOfShares)}
+              </MediumText>
+            </View>
           </View>
-          {mutableData.tags && (
-            <ScrollView
-              showsVerticalScrollIndicator={false}
-              style={{ width, height }}
-              contentContainerStyle={styles.tagListContentContainerStaticStyle}
-            >
-              {mutableData.tags.map((id, index) => (
-                <Tag
-                  id={id}
-                  key={"tag" + index}
-                  style={styles.tagStaticStyle}
-                />
-              ))}
-            </ScrollView>
+          {filteredLikes && (
+            <RegularText style={styles.likeTextStaticStyle}>
+              liked by <MediumText>{filteredLikes[0].socialId}</MediumText>
+              {filteredLikes.length > 1 && (
+                <RegularText>
+                  {" "}
+                  and <MediumText>{filteredLikes[1].socialId}</MediumText>
+                </RegularText>
+              )}
+            </RegularText>
           )}
-        </ScrollView>
-      )}
+          <HighlightedItem
+            text={genre}
+            type="solid"
+            color="white"
+            size={SIZE_REF_12 + SIZE_REF_1}
+            backgroundColor="#292828"
+            style={styles.genreContainerStaticStyle}
+          />
+        </View>
+        {tags && (
+          <ScrollView
+            showsVerticalScrollIndicator={false}
+            style={{ width, height }}
+            contentContainerStyle={styles.tagListContentContainerStaticStyle}
+          >
+            {tags.map((tag) => (
+              <Tag {...tag} key={tag.id} style={styles.tagStaticStyle} />
+            ))}
+          </ScrollView>
+        )}
+      </ScrollView>
     </Animated.View>
   );
 };
@@ -184,13 +170,18 @@ const styles = StyleSheet.create({
     paddingHorizontal: SIZE_REF_8,
     paddingVertical: SIZE_REF_16,
   },
-  rootListStaticStyle: {
+  listStaticStyle: {
     width: "100%",
     flex: 1,
   },
   tagStaticStyle: {
     marginHorizontal: SIZE_REF_8,
     marginVertical: SIZE_REF_16,
+  },
+  genreContainerStaticStyle: {
+    position: "absolute",
+    top: SIZE_REF_8,
+    left: SIZE_REF_8,
   },
 });
 

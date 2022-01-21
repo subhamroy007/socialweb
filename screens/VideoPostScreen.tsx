@@ -7,21 +7,14 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import Info from "../components/global/EntityInfo";
 import HighlightedContent from "../components/global/HighlightedItem";
 import ItemSeparator from "../components/global/ItemSeparator";
-import {
-  PlaceHolder,
-  VideoPostScreenPlaceHolder,
-} from "../components/global/placeholders";
+
 import RoundedIcon from "../components/global/RoundedIcon";
 import VideoPlayer from "../components/videoPost/VIdeoPlayer";
 import useVideoResizer from "../hooks/useVideoResizer";
-import { getVideoPostThunk } from "../store/appData/reducer";
 import { selectVideoPostState } from "../store/appData/selector";
 import { restoreVideoPost } from "../store/appData/slice";
 import { RootState, useAppDispatch, useAppSelector } from "../store/appStore";
-import {
-  selectUserNoOfFollowers,
-  selectUserSocialId,
-} from "../store/user/selector";
+import { selectUserSocialId } from "../store/user/selector";
 import {
   selectVideoPostAuhor,
   selectVideoPostCommentCount,
