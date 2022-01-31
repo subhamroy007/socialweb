@@ -1,37 +1,42 @@
-import React, { useMemo } from "react";
-import { StyleProp, StyleSheet, View, ViewStyle } from "react-native";
+import React from "react";
+import { StyleSheet, View } from "react-native";
 import {
   PanGestureHandler,
   TapGestureHandler,
 } from "react-native-gesture-handler";
-import { SafeAreaView } from "react-native-safe-area-context";
 import { SIZE_REF_16 } from "../../utility/constants";
 import { RoundedIconProps } from "../../utility/types";
 import Icon from "./Icon";
 
-//a utility component that works like a rounded icon with a speicific background
-const RoundedIcon = (props: RoundedIconProps) => {
-  const { name, color, onDrag, onTap, scale, size, backgroundColor, style } =
-    props;
+const RoundedIcon = ({
+  name,
+  backgroundColor,
+  borderColor,
+  borderWidth,
+  color,
+  onDrag,
+  onTap,
+  scale,
+  size,
+  style,
+  type,
+}: RoundedIconProps) => {
+  const calculatedType = type ? type : "solid";
 
   const calculatedScale = scale ? scale : 0.5;
   const calculatedSize = size ? size : SIZE_REF_16 * 3;
   const calculatedBackgroundColor = backgroundColor
     ? backgroundColor
+    : calculatedType === "outline"
+    ? "transparent"
     : "#EBE8FB";
 
-  const rootContainerDynamicStyle: StyleProp<ViewStyle> = useMemo(() => {
-    return [
-      style,
-      styles.rootContainerStaticStyle,
-      {
-        borderRadius: calculatedSize * 0.5,
-        width: calculatedSize,
-        height: calculatedSize,
-        backgroundColor: calculatedBackgroundColor,
-      },
-    ];
-  }, [calculatedSize, style, calculatedBackgroundColor, calculatedSize]);
+  const calculatedBorderColor = borderColor ? borderColor : "white";
+  const calculatedBorderWidth = borderWidth
+    ? borderWidth
+    : calculatedType === "outline"
+    ? StyleSheet.hairlineWidth
+    : 0;
 
   return (
     <TapGestureHandler
@@ -47,7 +52,26 @@ const RoundedIcon = (props: RoundedIconProps) => {
         enableTrackpadTwoFingerGesture={true}
         onGestureEvent={onDrag}
       >
-        <View style={rootContainerDynamicStyle}>
+        <View
+          style={[
+            style,
+            styles.rootContainerStaticStyle,
+            {
+              borderRadius: calculatedSize * 0.5,
+              width:
+                calculatedType === "solid"
+                  ? calculatedSize
+                  : calculatedSize - calculatedBorderWidth,
+              height:
+                calculatedType === "solid"
+                  ? calculatedSize
+                  : calculatedSize - calculatedBorderWidth,
+              backgroundColor: calculatedBackgroundColor,
+              borderWidth: calculatedBorderWidth,
+              borderColor: calculatedBorderColor,
+            },
+          ]}
+        >
           <Icon
             name={name}
             color={color}

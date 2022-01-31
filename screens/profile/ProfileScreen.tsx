@@ -19,19 +19,6 @@ import {
   useAppDispatch,
   useAppSelector,
 } from "../../store/appStore";
-import {
-  selectUserId,
-  selectUserProfileState,
-} from "../../store/appData/selector";
-import {
-  selectUserBio,
-  selectUserFollowersCount,
-  selectUserFollowingsCount,
-  selectUserLinkList,
-  selectUserSocialId,
-  selectUserUploadsCount,
-  selectUserUsername,
-} from "../../store/user/selector";
 import { shallowEqual } from "react-redux";
 import LoadingIndicator from "../../components/global/LoadingIndicator";
 import Avatar from "../../components/global/Avatar";
@@ -49,23 +36,20 @@ import {
   RootTabNavigatorParamList,
 } from "../../utility/types";
 import { StackScreenProps } from "@react-navigation/stack";
-import ImageGallery from "../../components/profile/ImageGallery";
 import TabBarItem from "../../components/profile/TabBarItem";
 import TabBar from "../../components/profile/TabBar";
-import VideoCollection from "../../components/profile/VideoCollection";
 import TabList from "../../components/profile/TabList";
-import { getUserProfileResponseThunk } from "../../store/appData/reducer";
 
-const renderItem = (item: ListRenderItemInfo<Link>) => {
-  return (
-    <HighlightedContent>
-      <MediumText style={styles.primaryTextStaticStyle}>
-        <Icon name={item.item.icon} size={SIZE_REF_12} />
-        {" " + item.item.title}
-      </MediumText>
-    </HighlightedContent>
-  );
-};
+// const renderItem = (item: ListRenderItemInfo<Link>) => {
+//   return (
+//     <HighlightedContent>
+//       <MediumText style={styles.primaryTextStaticStyle}>
+//         <Icon name={item.item.icon} size={SIZE_REF_12} />
+//         {" " + item.item.title}
+//       </MediumText>
+//     </HighlightedContent>
+//   );
+// };
 
 const keyExtractor = createKeyExtractor("link");
 
@@ -75,46 +59,6 @@ type ProfileScreenProps = CompositeScreenProps<
 >;
 
 const ProfileScreen = ({ navigation }: ProfileScreenProps) => {
-  const dispatch = useAppDispatch();
-
-  const state = useAppSelector(selectUserProfileState);
-
-  const userId = useAppSelector(selectUserId);
-
-  const mutableDataSelectorCallback = useCallback((state: RootState) => {
-    const socialId = selectUserSocialId(state, userId);
-    const username = selectUserUsername(state, userId);
-    const uploadsCount = selectUserUploadsCount(state, userId);
-    const followersCount = selectUserFollowersCount(state, userId);
-    const followingsCount = selectUserFollowingsCount(state, userId);
-    const bio = selectUserBio(state, userId);
-    const links = selectUserLinkList(state, userId);
-
-    return {
-      socialId,
-      username,
-      uploadsCount,
-      followersCount,
-      followingsCount,
-      bio,
-      links,
-    };
-  }, []);
-
-  const {
-    bio,
-    followersCount,
-    followingsCount,
-    links,
-    socialId,
-    uploadsCount,
-    username,
-  } = useAppSelector(mutableDataSelectorCallback, shallowEqual);
-
-  useEffect(() => {
-    dispatch(getUserProfileResponseThunk({ id: userId }));
-  }, []);
-
   const linkItemSeparatorCallback = useCallback(
     () => <ItemSeparator axis="vertical" length={SIZE_REF_8} />,
     []
@@ -137,7 +81,7 @@ const ProfileScreen = ({ navigation }: ProfileScreenProps) => {
       edges={["left", "right"]}
       style={[globalLayouts.screenLayout, globalColors.screenColor]}
     >
-      {uploadsCount && (
+      {/* {uploadsCount && (
         <ScrollView
           showsVerticalScrollIndicator={false}
           style={styles.listStaticStyle}
@@ -285,8 +229,7 @@ const ProfileScreen = ({ navigation }: ProfileScreenProps) => {
             <VideoCollection id={userId} />
           </TabList>
         </ScrollView>
-      )}
-      {state === "loading" && <LoadingIndicator size={SIZE_REF_10 * 4} />}
+      )} */}
     </SafeAreaView>
   );
 };

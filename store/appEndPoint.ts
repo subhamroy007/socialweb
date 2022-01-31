@@ -9,7 +9,7 @@ export const appEndPoint = createApi({
     cache: "no-store",
     keepalive: true,
     prepareHeaders: (headers, { getState }) => {
-      const userInfo = (getState() as RootState).appData.userInfo;
+      const userInfo = (getState() as RootState).appData.userDetails;
       headers.set("user-id", userInfo.id);
       headers.set("auth-token", userInfo.authToken);
       headers.set("refresh-token", userInfo.refreshToken);

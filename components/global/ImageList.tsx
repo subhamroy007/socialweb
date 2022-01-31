@@ -8,9 +8,9 @@ import ImagePost from "../imagePost/ImagePost";
 import ItemSeparator from "./ItemSeparator";
 import LoadingIndicator from "./LoadingIndicator";
 
-const renderItem = (item: ListRenderItemInfo<string>) => {
-  return <ImagePost id={item.item} />;
-};
+// const renderItem = (item: ListRenderItemInfo<string>) => {
+//   return <ImagePost id={item.item} />;
+// };
 
 const keyExtractor = createKeyExtractor("image");
 
@@ -41,8 +41,8 @@ const ImageList = ({
       ListHeaderComponent={headerComponent}
       extraData={{ dataState, ...extraData }}
       data={ids}
-      renderItem={renderItem}
-      keyExtractor={keyExtractor}
+      renderItem={() => null}
+      // keyExtractor={keyExtractor}
       showsVerticalScrollIndicator={false}
       ItemSeparatorComponent={itemSeparatorCallback}
       ListFooterComponent={footerComponentCallback}

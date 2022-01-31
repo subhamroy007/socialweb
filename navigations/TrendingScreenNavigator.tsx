@@ -19,16 +19,6 @@ import { StatusBar, StyleSheet } from "react-native";
 import TrendingImageScreen from "../screens/trending/TrendingImageScreen";
 import TrendingVideoScreen from "../screens/trending/TrendingVideoScreen";
 import { useAppDispatch, useAppSelector } from "../store/appStore";
-import { switchTrendingScreenFocus } from "../store/appData/slice";
-import {
-  selectTrendingHashTagIdList,
-  selectTrendingImageIdList,
-  selectTrendingScreenLastRefreshTimestamp,
-  selectTrendingScreenState,
-  selectTrendingVideoIdList,
-} from "../store/appData/selector";
-import { useFocusEffect } from "@react-navigation/native";
-import { getInitTrendingDataThunk } from "../store/appData/reducer";
 import LoadingIndicator from "../components/global/LoadingIndicator";
 import BlankScreenPlaceHolder from "../components/global/BlankScreenPlaceHolder";
 
@@ -97,77 +87,31 @@ const trendingVideoScreenOptions: MaterialTopTabNavigationOptions = {
 };
 
 const TrendingScreenNavigator = () => {
-  const state = useAppSelector(selectTrendingScreenState);
-
-  const lastRefreshTimestamp = useAppSelector(
-    selectTrendingScreenLastRefreshTimestamp
-  );
-
-  const hashTagIdList = useAppSelector(selectTrendingHashTagIdList);
-  const imagePostIdList = useAppSelector(selectTrendingImageIdList);
-  const videoPostIdList = useAppSelector(selectTrendingVideoIdList);
-
-  const dispatch = useAppDispatch();
-
-  useFocusEffect(
-    useCallback(() => {
-      if (
-        !lastRefreshTimestamp ||
-        Date.now() - lastRefreshTimestamp > MAX_SCREEN_REFRESH_TIME_INTERVAL
-      ) {
-        dispatch(getInitTrendingDataThunk());
-      }
-    }, [lastRefreshTimestamp])
-  );
-
   return (
     <>
-      {!state || state === "loading" ? (
-        <LoadingIndicator
-          color="black"
-          size={SIZE_REF_10 * 4}
-          style={styles.spinnerStaticStyle}
+      <TrendingScreenTab.Navigator
+        initialLayout={initialScreenLayout}
+        backBehavior="none"
+        screenOptions={defaultScreenOptions}
+        sceneContainerStyle={styles.sceneContainerStaticStyle}
+      >
+        <TrendingScreenTab.Screen
+          name="TrendingHashTagScreen"
+          component={TrendingHashTagScreen}
+          options={trendingHashTagScreenOptions}
         />
-      ) : state === "failure" &&
-        (!hashTagIdList || hashTagIdList.length === 0) &&
-        (!imagePostIdList || imagePostIdList.length === 0) &&
-        (!videoPostIdList || videoPostIdList.length === 0) ? (
-        <BlankScreenPlaceHolder icon="chevron-down" text="" />
-      ) : (
-        <TrendingScreenTab.Navigator
-          initialLayout={initialScreenLayout}
-          backBehavior="none"
-          screenOptions={defaultScreenOptions}
-          sceneContainerStyle={styles.sceneContainerStaticStyle}
-          screenListeners={{
-            focus: ({ target }) => {
-              if (target?.startsWith("TrendingHashTagScreen")) {
-                dispatch(switchTrendingScreenFocus("hashtag"));
-              } else if (target?.startsWith("TrendingImageScreen")) {
-                dispatch(switchTrendingScreenFocus("imagePost"));
-              } else {
-                dispatch(switchTrendingScreenFocus("videoPost"));
-              }
-            },
-          }}
-        >
-          <TrendingScreenTab.Screen
-            name="TrendingHashTagScreen"
-            component={TrendingHashTagScreen}
-            options={trendingHashTagScreenOptions}
-          />
-          <TrendingScreenTab.Screen
-            name="TrendingImageScreen"
-            component={TrendingImageScreen}
-            options={trendingImageScreenOptions}
-          />
-          <TrendingScreenTab.Screen
-            name="TrendingVideoScreen"
-            component={TrendingVideoScreen}
-            options={trendingVideoScreenOptions}
-          />
-        </TrendingScreenTab.Navigator>
-      )}
+        <TrendingScreenTab.Screen
+          name="TrendingImageScreen"
+          component={TrendingImageScreen}
+          options={trendingImageScreenOptions}
+        />
+        <TrendingScreenTab.Screen
+          name="TrendingVideoScreen"
+          component={TrendingVideoScreen}
+          options={trendingVideoScreenOptions}
+        />
+      </TrendingScreenTab.Navigator>
+      )
     </>
   );
 };

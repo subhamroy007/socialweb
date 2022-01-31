@@ -26,7 +26,7 @@ const LoadingIndicator = ({ size, color, style }: LoadingIndicatorProps) => {
 
   const rootContainerDynamicStyle = useAnimatedStyle(() => {
     return {
-      transform: [{ rotate: animatedValue.value + "deg" }],
+      transform: [{ rotateZ: animatedValue.value + "deg" }],
     };
   });
 
@@ -43,8 +43,11 @@ const LoadingIndicator = ({ size, color, style }: LoadingIndicatorProps) => {
 
   return (
     <Animated.View
-      style={[style, rootContainerDynamicStyle]}
-      exiting={FadeOut.duration(200).easing(Easing.out(Easing.quad))}
+      style={[
+        style,
+        rootContainerDynamicStyle,
+        styles.rootConatainerStaticStyle,
+      ]}
     >
       <Icon color={calculatedColor} name="loading" size={calculatedSize} />
     </Animated.View>
@@ -53,7 +56,6 @@ const LoadingIndicator = ({ size, color, style }: LoadingIndicatorProps) => {
 
 const styles = StyleSheet.create({
   rootConatainerStaticStyle: {
-    width: "100%",
     flexWrap: "nowrap",
     alignItems: "center",
     justifyContent: "center",

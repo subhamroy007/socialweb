@@ -40,7 +40,7 @@ const RootTabNavigator = () => {
                   numberOfLines={1}
                   ellipsizeMode="tail"
                 >
-                  {"social"}
+                  {"Social"}
                 </MediumText>
               }
               rightSideComponent={
@@ -95,8 +95,8 @@ const styles = StyleSheet.create({
     backgroundColor: "#FDFDFD",
   },
   headerTextStaticStyle: {
-    fontSize: SIZE_REF_6 * 3,
-    lineHeight: SIZE_REF_6 * 3,
+    fontSize: SIZE_REF_10 * 2,
+    lineHeight: SIZE_REF_10 * 2,
   },
 });
 

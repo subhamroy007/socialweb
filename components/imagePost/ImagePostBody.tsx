@@ -3,6 +3,7 @@ import { StyleSheet } from "react-native";
 import FastImage from "react-native-fast-image";
 import {
   HandlerStateChangeEvent,
+  ScrollView,
   State,
   TapGestureHandler,
   TapGestureHandlerEventPayload,
@@ -69,14 +70,14 @@ const ImagePostBody = ({ images, ...restProps }: ImagePostBodyProps) => {
       <Animated.View
         style={[styles.rootContainerStaticStyle, imageDynamicStyle]}
       >
-        <Animated.ScrollView
+        <ScrollView
           style={styles.listStaticStyle}
           onScroll={scrollEventCallback}
           horizontal={true}
           pagingEnabled={true}
           showsHorizontalScrollIndicator={false}
         >
-          {imageConfigList.map((item, index) => (
+          {/* {imageConfigList.map((item, index) => (
             <FastImage
               key={item.uri + "-" + index}
               source={{
@@ -90,8 +91,23 @@ const ImagePostBody = ({ images, ...restProps }: ImagePostBodyProps) => {
               ]}
               resizeMode={item.resizeMode}
             />
-          ))}
-        </Animated.ScrollView>
+          ))} */}
+          <FastImage
+            source={{
+              cache: "immutable",
+              priority: "high",
+              uri: imageConfigList[0].uri,
+            }}
+            style={[
+              styles.imageStaticStyle,
+              {
+                width: imageConfigList[0].width,
+                height: imageConfigList[0].height,
+              },
+            ]}
+            resizeMode={imageConfigList[0].resizeMode}
+          />
+        </ScrollView>
         {isOverlayVisible && (
           <ImagePostOverlay
             {...restProps}

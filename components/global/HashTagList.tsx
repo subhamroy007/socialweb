@@ -4,13 +4,12 @@ import { FlatList } from "react-native-gesture-handler";
 import { SIZE_REF_10, SIZE_REF_8 } from "../../utility/constants";
 import { createKeyExtractor } from "../../utility/helpers";
 import { ListProps } from "../../utility/types";
-import { HashTagInfo } from "./EntityInfo";
 import ItemSeparator from "./ItemSeparator";
 import LoadingIndicator from "./LoadingIndicator";
 
-const renderItem = (item: ListRenderItemInfo<string>) => {
-  return <HashTagInfo id={item.item} />;
-};
+// const renderItem = (item: ListRenderItemInfo<string>) => {
+//   return <HashTagInfo id={item.item} />;
+// };
 
 const keyExtractor = createKeyExtractor("hashtag");
 
@@ -49,8 +48,8 @@ const HashTagList = ({
       ListHeaderComponent={headerComponent}
       extraData={dataState}
       data={ids}
-      renderItem={renderItem}
-      keyExtractor={keyExtractor}
+      renderItem={() => null}
+      // keyExtractor={keyExtractor}
       showsVerticalScrollIndicator={false}
       ItemSeparatorComponent={itemSeparatorCallback}
       getItemLayout={itemLayoutCallback}

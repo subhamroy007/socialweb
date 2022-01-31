@@ -43,14 +43,10 @@ const ImagePostOverlay = ({
             <View style={styles.iconCountPairContainerStaticStyle}>
               <RoundedIcon
                 name="heart-solid"
-                backgroundColor="transparent"
                 color="white"
                 scale={0.7}
+                type="outline"
                 size={SIZE_REF_8 * 7}
-                style={{
-                  borderWidth: StyleSheet.hairlineWidth,
-                  borderColor: "white",
-                }}
               />
               <MediumText style={styles.countTextStaticStyle}>
                 {countAbbreviator(noOfLikes)}
@@ -59,14 +55,10 @@ const ImagePostOverlay = ({
             <View style={styles.iconCountPairContainerStaticStyle}>
               <RoundedIcon
                 name="comment-solid"
-                backgroundColor="transparent"
                 color="white"
                 scale={0.7}
                 size={SIZE_REF_8 * 7}
-                style={{
-                  borderWidth: StyleSheet.hairlineWidth,
-                  borderColor: "white",
-                }}
+                type="outline"
               />
               <MediumText style={styles.countTextStaticStyle}>
                 {countAbbreviator(noOfComments)}
@@ -75,14 +67,10 @@ const ImagePostOverlay = ({
             <View style={styles.iconCountPairContainerStaticStyle}>
               <RoundedIcon
                 name="send"
-                backgroundColor="transparent"
                 color="white"
                 scale={0.7}
                 size={SIZE_REF_8 * 7}
-                style={{
-                  borderWidth: StyleSheet.hairlineWidth,
-                  borderColor: "white",
-                }}
+                type="outline"
               />
               <MediumText style={styles.countTextStaticStyle}>
                 {countAbbreviator(noOfShares)}

@@ -45,8 +45,6 @@ export const globalColors = StyleSheet.create({
 export const globalLayouts = StyleSheet.create({
   screenLayout: {
     flex: 1,
-    display: "flex",
-    flexDirection: "column",
     flexWrap: "nowrap",
     alignItems: "center",
     justifyContent: "center",

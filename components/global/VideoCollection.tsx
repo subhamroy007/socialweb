@@ -8,9 +8,9 @@ import VideoThumbnail from "../videoPost/VideoThumbnail";
 import ItemSeparator from "./ItemSeparator";
 import LoadingIndicator from "./LoadingIndicator";
 
-const renderItem = (item: ListRenderItemInfo<string>) => {
-  return <VideoThumbnail id={item.item} />;
-};
+// const renderItem = (item: ListRenderItemInfo<string>) => {
+//   return <VideoThumbnail id={item.item} />;
+// };
 
 const keyExtractor = createKeyExtractor("video");
 
@@ -42,8 +42,8 @@ const VideoCollection = ({
   return (
     <FlatList
       data={ids}
-      renderItem={renderItem}
-      keyExtractor={keyExtractor}
+      renderItem={() => null}
+      // keyExtractor={keyExtractor}
       showsVerticalScrollIndicator={false}
       onEndReachedThreshold={0.2}
       onEndReached={onEndReach}

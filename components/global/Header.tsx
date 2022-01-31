@@ -1,7 +1,8 @@
 import { BottomTabHeaderProps } from "@react-navigation/bottom-tabs";
 import React from "react";
-import { StyleSheet, View } from "react-native";
+import { StatusBar, StyleSheet, View } from "react-native";
 import {
+  initialWindowMetrics,
   SafeAreaView,
   useSafeAreaInsets,
 } from "react-native-safe-area-context";
@@ -15,7 +16,11 @@ import {
   WINDOW_WIDTH,
 } from "../../utility/constants";
 import { globalColors } from "../../utility/styles";
-import { BottomTabScreenHeaderProps, HeaderProps } from "../../utility/types";
+import {
+  BottomTabScreenHeaderProps,
+  HeaderProps,
+  StackScreenHeaderProps,
+} from "../../utility/types";
 
 const Header = ({
   leftSideComponent,
@@ -75,8 +80,25 @@ export const BottomTabScreenHeader = ({
         style,
         {
           paddingTop: insets.top,
-          paddingLeft: insets.left,
-          paddingRight: insets.right,
+          width: WINDOW_WIDTH,
+          height: HEADER_HEIGHT,
+        },
+      ]}
+    />
+  );
+};
+
+export const StackScreenHeader = ({
+  headerProps,
+  style,
+  ...restProps
+}: StackScreenHeaderProps) => {
+  return (
+    <Header
+      {...restProps}
+      style={[
+        style,
+        {
           width: WINDOW_WIDTH,
           height: HEADER_HEIGHT,
         },

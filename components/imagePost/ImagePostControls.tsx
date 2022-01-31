@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback } from "react";
 import Icon from "../global/Icon";
 import { StyleSheet, View } from "react-native";
 import { SIZE_REF_10, SIZE_REF_16, SIZE_REF_8 } from "../../utility/constants";
@@ -17,8 +17,28 @@ export type ImageFeedScreenProps = StackScreenProps<
 
 export type ImageFeedScreenNavigationProps = ImageFeedScreenProps["navigation"];
 
-const ImagePostControls = ({ hasLiked, hasSaved }: ImagePostControlsProps) => {
+const ImagePostControls = ({
+  hasLiked,
+  hasSaved,
+  id,
+}: ImagePostControlsProps) => {
   const navigation = useNavigation<ImageFeedScreenNavigationProps>();
+
+  const likeIconTapCallback = useCallback(() => {}, []);
+
+  const commentIconTapCallback = useCallback(() => {
+    if (navigation.isFocused()) {
+      navigation.navigate("PostEngagementScreen", {
+        id,
+        initialTabIndex: 1,
+        type: "image-post",
+      });
+    }
+  }, [id, navigation]);
+
+  const shareIconTapCallback = useCallback(() => {}, []);
+
+  const bookmarkIconTapCallback = useCallback(() => {}, []);
 
   return (
     <View style={styles.rootContainerStaticStyle}>
@@ -28,19 +48,27 @@ const ImagePostControls = ({ hasLiked, hasSaved }: ImagePostControlsProps) => {
           name={hasLiked ? "heart-solid" : "heart-outline"}
           size={SIZE_REF_10 * 3}
           style={styles.icon}
+          onTap={likeIconTapCallback}
         />
         <Icon
           color="black"
           name="comment-outline"
           size={SIZE_REF_10 * 3}
           style={styles.icon}
+          onTap={commentIconTapCallback}
         />
-        <Icon color="black" name="send" size={SIZE_REF_10 * 3} />
+        <Icon
+          color="black"
+          name="send"
+          size={SIZE_REF_10 * 3}
+          onTap={shareIconTapCallback}
+        />
       </View>
       <Icon
         color="black"
         name={hasSaved ? "bookmark-solid" : "bookmark-outline"}
         size={SIZE_REF_10 * 3}
+        onTap={bookmarkIconTapCallback}
       />
     </View>
   );

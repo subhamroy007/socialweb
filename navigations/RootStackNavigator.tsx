@@ -1,13 +1,22 @@
 import { createStackNavigator } from "@react-navigation/stack";
 import React from "react";
+import {
+  initialWindowMetrics,
+  useSafeAreaInsets,
+} from "react-native-safe-area-context";
+import { StackScreenHeader } from "../components/global/Header";
+import Icon from "../components/global/Icon";
+import Info from "../components/global/Info";
 import LiveScreen from "../screens/LiveScreen";
 import OverlayScreen from "../screens/OverlayScreen";
+import PostEngagementScreen from "../screens/PostEngagementScreen";
 import StoryFeedScreen from "../screens/StoryFeedScreen";
 import VideoPostScreen from "../screens/VideoPostScreen";
 import VideoPreviewScreen from "../screens/VIdeoPreviewScreen";
+import { SIZE_REF_6 } from "../utility/constants";
 import { RootStackNavigatorParamList } from "../utility/types";
+import { MediumText } from "../utility/ui";
 import FollowerFollowingNavigator from "./FollowerFollowingNavigator";
-import PostEngagementNavigator from "./PostEngagementNavigator";
 import RootTabNavigator from "./RootTabNavigator";
 
 const StackNavigator = createStackNavigator<RootStackNavigatorParamList>();
@@ -45,12 +54,11 @@ const RootStackNavigator = () => {
         component={StoryFeedScreen}
       />
       <StackNavigator.Screen
-        name="PostEngagementStack"
-        component={PostEngagementNavigator}
+        name="PostEngagementScreen"
+        component={PostEngagementScreen}
         options={{
-          // header: (props) => <MetaScreenHeader {...props} />,
+          presentation: "modal",
           headerShown: true,
-          headerTitle: "Comments",
         }}
       />
       <StackNavigator.Screen

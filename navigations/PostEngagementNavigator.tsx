@@ -3,14 +3,12 @@ import {
   MaterialTopTabNavigationOptions,
 } from "@react-navigation/material-top-tabs";
 import { StackScreenProps } from "@react-navigation/stack";
-import React, { useCallback } from "react";
+import React from "react";
 import { StatusBar, StyleSheet } from "react-native";
 import Icon from "../components/global/Icon";
 import CommentScreen from "../screens/engagement/CommentScreen";
 import LikeScreen from "../screens/engagement/LikeScreen";
 import ShareScreen from "../screens/engagement/ShareSreen";
-import { RootState, useAppSelector } from "../store/appStore";
-import { selectImagePostLikesCommentShareCount } from "../store/imagePost/selectors";
 import {
   HEADER_HEIGHT,
   SIZE_REF_10,
@@ -99,18 +97,6 @@ const PostEngagementNavigator = ({
   navigation,
   route,
 }: PostEngagementNavigatorProps) => {
-  const id = route.params.params?.id;
-  const type = route.params.params?.type;
-
-  const countsSelectorCallback = useCallback(
-    (state: RootState) => {
-      return selectImagePostLikesCommentShareCount(state, id as string);
-    },
-    [id, type]
-  );
-
-  const counts = useAppSelector(countsSelectorCallback);
-
   return (
     <TabNavigator.Navigator
       keyboardDismissMode="on-drag"
@@ -118,23 +104,6 @@ const PostEngagementNavigator = ({
       backBehavior="none"
       screenOptions={defaultScreenOptions}
       initialRouteName="CommentScreen"
-      screenListeners={{
-        focus: ({ target }) => {
-          if (target?.startsWith("LikeScreen")) {
-            navigation.setOptions({
-              headerTitle: "Likes " + counts?.likesCount,
-            });
-          } else if (target?.startsWith("CommentScreen")) {
-            navigation.setOptions({
-              headerTitle: "Comments " + counts?.commentsCount,
-            });
-          } else if (target?.startsWith("ShareScreen")) {
-            navigation.setOptions({
-              headerTitle: "Shares " + counts?.sharesCount,
-            });
-          }
-        },
-      }}
       sceneContainerStyle={styles.sceneContainerStaticStyle}
     >
       <TabNavigator.Screen

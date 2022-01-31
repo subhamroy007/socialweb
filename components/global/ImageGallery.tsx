@@ -12,33 +12,6 @@ import { ListProps } from "../../utility/types";
 import ImageGalleryItem from "../profile/ImageGalleryItem";
 import LoadingIndicator from "./LoadingIndicator";
 
-// const renderItem = (item: ListRenderItemInfo<string>) => {
-//   let imageContainerStyle: StyleProp<ViewStyle>;
-
-//   switch (item.index % 3) {
-//     case 0:
-//       imageContainerStyle = [styles.leftSideImageContainerStaticStyle];
-//       break;
-//     case 1:
-//       imageContainerStyle = [
-//         styles.leftSideImageContainerStaticStyle,
-//         styles.rightSideImageContainerStaticStyle,
-//       ];
-//       break;
-//     default:
-//       imageContainerStyle = [styles.rightSideImageContainerStaticStyle];
-//   }
-
-//   return (
-//     <ImageGalleryItem
-//       height={WINDOW_WIDTH / 3}
-//       width={WINDOW_WIDTH / 3}
-//       id={item.item}
-//       style={imageContainerStyle}
-//     />
-//   );
-// };
-
 const keyExtractor = createKeyExtractor("image");
 
 const ImageGallery = ({
@@ -64,45 +37,45 @@ const ImageGallery = ({
     []
   );
 
-  const renderItem = useCallback(
-    (item: ListRenderItemInfo<string>) => {
-      let imageContainerStyle: StyleProp<ViewStyle>;
+  // const renderItem = useCallback(
+  //   (item: ListRenderItemInfo<string>) => {
+  //     let imageContainerStyle: StyleProp<ViewStyle>;
 
-      switch (item.index % 3) {
-        case 0:
-          imageContainerStyle = [styles.leftSideImageContainerStaticStyle];
-          break;
-        case 1:
-          imageContainerStyle = [
-            styles.leftSideImageContainerStaticStyle,
-            styles.rightSideImageContainerStaticStyle,
-          ];
-          break;
-        default:
-          imageContainerStyle = [styles.rightSideImageContainerStaticStyle];
-      }
+  //     switch (item.index % 3) {
+  //       case 0:
+  //         imageContainerStyle = [styles.leftSideImageContainerStaticStyle];
+  //         break;
+  //       case 1:
+  //         imageContainerStyle = [
+  //           styles.leftSideImageContainerStaticStyle,
+  //           styles.rightSideImageContainerStaticStyle,
+  //         ];
+  //         break;
+  //       default:
+  //         imageContainerStyle = [styles.rightSideImageContainerStaticStyle];
+  //     }
 
-      if (Math.floor(item.index / 3) === 0) {
-        imageContainerStyle.push(styles.topLevelImageContainerStaticStyle);
-      } else if (Math.floor(item.index / 3) === Math.floor(ids.length / 3)) {
-        imageContainerStyle.push(styles.bottomLevelImageContainerStaticStyle);
-      } else {
-        imageContainerStyle.push(
-          styles.bottomLevelImageContainerStaticStyle,
-          styles.topLevelImageContainerStaticStyle
-        );
-      }
-      return (
-        <ImageGalleryItem
-          height={WINDOW_WIDTH / 3}
-          width={WINDOW_WIDTH / 3}
-          id={item.item}
-          style={imageContainerStyle}
-        />
-      );
-    },
-    [ids.length]
-  );
+  //     if (Math.floor(item.index / 3) === 0) {
+  //       imageContainerStyle.push(styles.topLevelImageContainerStaticStyle);
+  //     } else if (Math.floor(item.index / 3) === Math.floor(ids.length / 3)) {
+  //       imageContainerStyle.push(styles.bottomLevelImageContainerStaticStyle);
+  //     } else {
+  //       imageContainerStyle.push(
+  //         styles.bottomLevelImageContainerStaticStyle,
+  //         styles.topLevelImageContainerStaticStyle
+  //       );
+  //     }
+  //     return (
+  //       <ImageGalleryItem
+  //         height={WINDOW_WIDTH / 3}
+  //         width={WINDOW_WIDTH / 3}
+  //         id={item.item}
+  //         style={imageContainerStyle}
+  //       />
+  //     );
+  //   },
+  //   [ids.length]
+  // );
 
   return (
     <FlatList
@@ -113,8 +86,8 @@ const ImageGallery = ({
       onEndReachedThreshold={0.2}
       onEndReached={onEndReach}
       getItemLayout={itemLayoutCallback}
-      keyExtractor={keyExtractor}
-      renderItem={renderItem}
+      // keyExtractor={keyExtractor}
+      renderItem={() => null}
       showsVerticalScrollIndicator={false}
       numColumns={3}
       style={styles.listStaticStyle}

@@ -1,29 +1,17 @@
 import {
-  Account,
-  AccountDetails,
-  AccountInfo,
   AccountMediumResponse,
   AccountShortResponse,
-  Comment,
-  CommentInfo,
-  HashTag,
-  HashTagDetails,
-  HashTagInfo,
+  AccountWithTimestampResponse,
+  CommentResponse,
   HashTagShortResponse,
   ImageConfig,
-  ImagePost,
-  ImagePostDetails,
-  ImagePostInfo,
   ImagePostResponse,
   Link,
   MediaInfo,
   PageResponse,
-  ReplyInfo,
+  ReplyResponse,
   Size,
-  VideoPost,
-  VideoPostDetails,
-  VideoPostInfo,
-  VideoPostPreviewInfo,
+  VideoThumbnailResponse,
 } from "./types";
 import { ResizeMode } from "react-native-fast-image";
 import faker from "faker";
@@ -79,22 +67,22 @@ export const timeElapsed = (timestamp: number): string => {
     timeString = "Just now";
   } else if (elapsedTime >= 60 && elapsedTime < 3600) {
     let time = Math.floor(elapsedTime / 60);
-    timeString = time + "min";
+    timeString = time + " min";
   } else if (elapsedTime >= 3600 && elapsedTime < 86400) {
     let time = Math.floor(elapsedTime / 3600);
-    timeString = time + "hr";
+    timeString = time + " hr";
   } else if (elapsedTime >= 86400 && elapsedTime < 604800) {
     let time = Math.floor(elapsedTime / 86400);
-    timeString = time + "days";
+    timeString = time + " days";
   } else if (elapsedTime >= 604800 && elapsedTime < 2592000) {
     let time = Math.floor(elapsedTime / 604800);
-    timeString = time + "weeks";
+    timeString = time + " weeks";
   } else if (elapsedTime >= 2592000 && elapsedTime < 31104000) {
     let time = Math.floor(elapsedTime / 2592000);
-    timeString = time + "months";
+    timeString = time + " months";
   } else {
     let time = Math.floor(elapsedTime / 31104000);
-    timeString = time + "years";
+    timeString = time + " years";
   }
 
   return timeString;
@@ -103,48 +91,48 @@ export const timeElapsed = (timestamp: number): string => {
 export const countAbbreviator = (count: number): string => {
   let abbreviation: string = "";
   if (count < 1000) {
-    abbreviation = count + " ";
+    abbreviation = count + "";
   } else if (count >= 1000 && count < 1000000) {
     if (count < 10000) {
       let newCount = count / 100;
       if (newCount % 10 >= 1) {
         newCount = count / 1000;
-        abbreviation = newCount.toFixed(1) + "K";
+        abbreviation = newCount.toFixed(1) + "k";
       } else {
         newCount = Math.floor(count / 1000000);
-        abbreviation = newCount + "K";
+        abbreviation = newCount + "k";
       }
     } else {
       let newCount = Math.floor(count / 1000);
-      abbreviation = newCount + "K";
+      abbreviation = newCount + "k";
     }
   } else if (count >= 1000000 && count < 100000000) {
     if (count < 10000000) {
       let newCount = count / 100000;
       if (newCount % 10 >= 1) {
         newCount = count / 1000000;
-        abbreviation = newCount.toFixed(1) + "M";
+        abbreviation = newCount.toFixed(1) + "m";
       } else {
         newCount = Math.floor(count / 1000000);
-        abbreviation = newCount + "M";
+        abbreviation = newCount + "m";
       }
     } else {
       let newCount = Math.floor(count / 1000000);
-      abbreviation = newCount + "M";
+      abbreviation = newCount + "m";
     }
   } else {
     if (count < 1000000000) {
       let newCount = count / 10000000;
       if (newCount % 10 >= 1) {
         newCount = count / 100000000;
-        abbreviation = newCount.toFixed(1) + "B";
+        abbreviation = newCount.toFixed(1) + "b";
       } else {
         newCount = Math.floor(count / 100000000);
-        abbreviation = newCount + "B";
+        abbreviation = newCount + "b";
       }
     } else {
       let newCount = Math.floor(count / 100000000);
-      abbreviation = newCount + "B";
+      abbreviation = newCount + "b";
     }
   }
   return abbreviation;
@@ -162,30 +150,27 @@ export const timeFormatter = (timestamp: number): string => {
 };
 
 export const timeStringGenerator = (timestamp: number): string => {
-  let timeInSeconds = Math.floor(timestamp / 1000);
+  const hoursRemander = Math.floor(timestamp / 3600);
+  timestamp = timestamp % 3600;
+  const minsRemander = Math.floor(timestamp / 60);
+  const secsRemander = timestamp % 60;
 
-  let resultString = "";
+  let timeString = "";
 
-  if (timeInSeconds / 3600 >= 1) {
-    const totalHours = Math.floor(timeInSeconds / 3600);
+  timeString =
+    (secsRemander > 9 ? secsRemander : "0" + secsRemander) + timeString;
 
-    resultString =
-      resultString + (totalHours > 9 ? totalHours : "0" + totalHours) + ":";
-  }
-  timeInSeconds = timeInSeconds % 3600;
-  if (timeInSeconds / 60 >= 1) {
-    const totalMins = Math.floor(timeInSeconds / 60);
-    resultString =
-      resultString + (totalMins > 9 ? totalMins : "0" + totalMins) + ":";
-  } else if (resultString !== "") {
-    resultString = resultString + "00:";
-  }
+  timeString =
+    (minsRemander > 9 ? minsRemander : "0" + minsRemander) + ":" + timeString;
 
-  timeInSeconds = timeInSeconds % 60;
-  resultString =
-    resultString + (timeInSeconds > 9 ? timeInSeconds : "0" + timeInSeconds);
+  timeString =
+    (hoursRemander > 0
+      ? hoursRemander > 9
+        ? hoursRemander + ":"
+        : "0" + hoursRemander + ":"
+      : "") + timeString;
 
-  return resultString;
+  return timeString;
 };
 
 export const dateString = (timestamp: number) => {
@@ -245,84 +230,13 @@ export function extractId<T extends { id: string }>(entity: T): string {
 
 export function createKeyExtractor(type: string) {
   return function <T extends { id: string }>(item: T, index?: number): string {
-    return item.id;
+    return item.id + "-" + index;
   };
 }
 
 export async function delay(millis: number): Promise<unknown> {
   return new Promise((resolve) => setTimeout(resolve, 5000));
 }
-//----------------------------------------------------------------------------------------------------
-
-//----------------------------------------------generators-------------------------------------------------
-export function generateHashTagInfo(): HashTagInfo {
-  return {
-    id: "hashtag@" + faker.datatype.uuid(),
-    isSaved: faker.datatype.boolean(),
-    name: faker.lorem.word(faker.datatype.number({ min: 4, max: 10 })),
-    uploadsCount: faker.datatype.number({ min: 0, max: 1000000 }),
-  };
-}
-
-export function generateHashTagInfoList(
-  length: number = faker.datatype.number({ min: 4, max: 25 })
-): HashTagInfo[] {
-  const list: HashTagInfo[] = [];
-
-  for (let i = 0; i < length; i++) {
-    list.push(generateHashTagInfo());
-  }
-
-  return list;
-}
-
-export function generatePaginatedHashTagInfo(
-  id: number = 0
-): PageResponse<HashTagInfo> {
-  return {
-    id,
-    length: HASHTAG_PAGE_SIZE,
-    noOfPages: 1000,
-    size: HASHTAG_PAGE_SIZE,
-    list: generateHashTagInfoList(HASHTAG_PAGE_SIZE),
-  };
-}
-
-// export function generateAccountInfo(): AccountInfo {
-//   return {
-//     id: "account@" + faker.datatype.uuid(),
-//     followersCount: faker.datatype.number({ min: 0, max: 10000000 }),
-//     isFollower: faker.datatype.boolean(),
-//     isFollowing: faker.datatype.boolean(),
-//     profilePictureUri: faker.image.imageUrl(),
-//     socialId: faker.name.firstName(),
-//     username: faker.name.findName(),
-//   };
-// }
-
-// export function generateAccountInfoList(
-//   length: number = faker.datatype.number({ min: 4, max: 25 })
-// ): AccountInfo[] {
-//   const list: AccountInfo[] = [];
-
-//   for (let i = 0; i < length; i++) {
-//     list.push(generateAccountInfo());
-//   }
-
-//   return list;
-// }
-
-// export function generatePaginatedAccountInfo(
-//   id: number = 0
-// ): PageResponse<AccountInfo> {
-//   return {
-//     id,
-//     length: ACCOUNT_PAGE_SIZE,
-//     noOfPages: 1000,
-//     size: ACCOUNT_PAGE_SIZE,
-//     list: generateAccountInfoList(ACCOUNT_PAGE_SIZE),
-//   };
-// }
 
 export function generateMediaInfo(): MediaInfo {
   const height = faker.datatype.number({ max: 480, min: 144 });
@@ -359,6 +273,8 @@ export function generateAccountMediumResponse(): AccountMediumResponse {
     hasUnSeenStroy: faker.datatype.boolean(),
     isFollowing: faker.datatype.boolean(),
     username: faker.name.findName(),
+    isFollower: faker.datatype.boolean(),
+    noOfFollowers: faker.datatype.number({ min: 0, max: 10000000 }),
   };
 }
 
@@ -369,6 +285,25 @@ export function generateAccountShortResponseList(
 
   for (let i = 0; i < length; i++) {
     list.push(generateAccountShortResponse());
+  }
+
+  return list;
+}
+
+export function generateAccountWithTimestampResponse(): AccountWithTimestampResponse {
+  return {
+    ...generateAccountMediumResponse(),
+    timestamp: faker.date.past(2, Date()).getMilliseconds(),
+  };
+}
+
+export function generateAccountWithTimestampResponseList(
+  length: number = faker.datatype.number({ min: 1, max: 10 })
+): AccountWithTimestampResponse[] {
+  const list: AccountWithTimestampResponse[] = [];
+
+  for (let i = 0; i < length; i++) {
+    list.push(generateAccountWithTimestampResponse());
   }
 
   return list;
@@ -392,41 +327,6 @@ export function generateHashTagShortResponseList(
 
   return list;
 }
-
-// export function generateImagePostInfo(): ImagePostInfo {
-//   return {
-//     author: generateAccountInfo(),
-//     id: "imagePost@" + faker.datatype.uuid(),
-//     images: generateMediaInfoList(faker.datatype.number({ min: 1, max: 12 })),
-//     isLiked: faker.datatype.boolean(),
-//     isSaved: faker.datatype.boolean(),
-//     timestamp: faker.date.past(5, Date()).getMilliseconds(),
-//   };
-// }
-
-// export function generateImagePostInfoList(
-//   length: number = faker.datatype.number({ min: 4, max: 25 })
-// ): ImagePostInfo[] {
-//   const list: ImagePostInfo[] = [];
-
-//   for (let i = 0; i < length; i++) {
-//     list.push(generateImagePostInfo());
-//   }
-
-//   return list;
-// }
-
-// export function generatePaginatedImagePostInfo(
-//   id: number = 0
-// ): PageResponse<ImagePostInfo> {
-//   return {
-//     id,
-//     length: IMAGE_POST_INFO_PAGE_SIZE,
-//     noOfPages: 1000,
-//     size: IMAGE_POST_INFO_PAGE_SIZE,
-//     list: generateImagePostInfoList(IMAGE_POST_INFO_PAGE_SIZE),
-//   };
-// }
 
 export function generateImagePostResponse(): ImagePostResponse {
   return {
@@ -468,106 +368,6 @@ export function generateImagePostResponseList(
   return list;
 }
 
-// export function generatePaginatedImagePostDetails(
-//   id: number = 0
-// ): PageResponse<ImagePostDetails> {
-//   return {
-//     id,
-//     length: IMAGE_POST_DETAILS_PAGE_SIZE,
-//     noOfPages: 1000,
-//     size: IMAGE_POST_DETAILS_PAGE_SIZE,
-//     list: generateImagePostDetailsList(IMAGE_POST_DETAILS_PAGE_SIZE),
-//   };
-// }
-
-// export function generateVideoPostInfo(): VideoPostInfo {
-//   const duration = faker.datatype.number({
-//     min: 30000,
-//     max: 120 * 60 * 1000,
-//   });
-
-//   return {
-//     author: generateAccountInfo(),
-//     duration,
-//     id: "videoPost@" + faker.datatype.uuid(),
-//     likesCount: faker.datatype.number({ min: 0, max: 100000 }),
-//     thumbnail: generateMediaInfo(),
-//     timestamp: faker.date.past(5, Date()).getMilliseconds(),
-//     title: faker.lorem.words(faker.datatype.number({ max: 16, min: 1 })),
-//     viewsCount: faker.datatype.number({ min: 0, max: 10000000 }),
-//     watchTime: faker.datatype.boolean()
-//       ? Math.floor(duration * Math.random())
-//       : null,
-//   };
-// }
-
-// export function generateVideoPostInfoList(
-//   length: number = faker.datatype.number({ min: 4, max: 25 })
-// ): VideoPostInfo[] {
-//   const list: VideoPostInfo[] = [];
-
-//   for (let i = 0; i < length; i++) {
-//     list.push(generateVideoPostInfo());
-//   }
-
-//   return list;
-// }
-
-// export function generatePaginatedVideoPostInfo(
-//   id: number = 0
-// ): PageResponse<VideoPostInfo> {
-//   return {
-//     id,
-//     length: VIDEO_POST_INFO_PAGE_SIZE,
-//     noOfPages: 1000,
-//     size: VIDEO_POST_INFO_PAGE_SIZE,
-//     list: generateVideoPostInfoList(VIDEO_POST_INFO_PAGE_SIZE),
-//   };
-// }
-
-// export function genererateVideoPostDetails(): VideoPostDetails {
-//   const duration = faker.datatype.number({
-//     min: 30000,
-//     max: 120 * 60 * 1000,
-//   });
-//   const media = generateMediaInfo();
-//   media.uri = "http://d23dyxeqlo5psv.cloudfront.net/big_buck_bunny.mp4";
-//   return {
-//     author: generateAccountInfo(),
-//     duration,
-//     id: "videoPost@" + faker.datatype.uuid(),
-//     thumbnail: generateMediaInfo(),
-//     timestamp: faker.date.past(5, Date()).getMilliseconds(),
-//     title: faker.lorem.words(faker.datatype.number({ max: 16, min: 1 })),
-//     viewsCount: faker.datatype.number({ min: 0, max: 10000000 }),
-//     watchTime: faker.datatype.boolean()
-//       ? Math.floor(duration * Math.random())
-//       : null,
-//     commentsCount: faker.datatype.number({ max: 10000, min: 0 }),
-//     genre: "comedy",
-//     isSaved: faker.datatype.boolean(),
-//     likes: {
-//       isLiked: faker.datatype.boolean(),
-//       likesCount: faker.datatype.number({ max: 100000, min: 0 }),
-//       filteredLikes: faker.datatype.boolean()
-//         ? generateAccountInfoList(faker.datatype.number({ min: 0, max: 2 }))
-//         : null,
-//     },
-//     sharesCount: faker.datatype.number({ max: 10000, min: 0 }),
-//     description: faker.datatype.boolean()
-//       ? faker.lorem.words(faker.datatype.number({ min: 1, max: 100 }))
-//       : null,
-//     hashtags: faker.datatype.boolean() ? generateHashTagInfoList() : null,
-//     tags: faker.datatype.boolean() ? generateAccountInfoList() : null,
-//     video: {
-//       media,
-//       credit: faker.datatype.boolean() ? 24000 : null,
-//       intro: faker.datatype.boolean() ? [10000, 16000] : null,
-//       recap: faker.datatype.boolean() ? [0, 9000] : null,
-//     },
-//   };
-// }
-
 export function generateLink(): Link {
   return {
     icon: "heart-solid",
@@ -588,103 +388,6 @@ export function generateLinkList(
   return list;
 }
 
-// export function generateAccountDetails(): AccountDetails {
-//   return {
-//     followers: {
-//       followersCount: faker.datatype.number({ min: 0, max: 10000000 }),
-//       isFollower: faker.datatype.boolean(),
-//       filteredFollowers: faker.datatype.boolean()
-//         ? generateAccountInfoList(faker.datatype.number({ min: 0, max: 2 }))
-//         : null,
-//     },
-//     followings: {
-//       followingsCount: faker.datatype.number({ min: 0, max: 1000 }),
-//       isFollowing: faker.datatype.boolean(),
-//     },
-//     id: "account@" + faker.datatype.uuid(),
-//     profilePictureUri: faker.image.imageUrl(),
-//     socialId: faker.name.firstName(),
-//     uploads: {
-//       uploadsCount: faker.datatype.number({ min: 0, max: 1000 }),
-//       imagePosts: faker.datatype.boolean()
-//         ? {
-//             category: "user/uploads",
-//             filter: "",
-//             recentTimestamp: 0,
-//             ...generatePaginatedImagePostDetails(),
-//           }
-//         : null,
-//       videoPosts: faker.datatype.boolean()
-//         ? {
-//             category: "user/uploads",
-//             filter: "",
-//             recentTimestamp: 0,
-//             ...generatePaginatedVideoPostInfo(),
-//           }
-//         : null,
-//     },
-//     username: faker.name.findName(),
-//     bio: faker.datatype.boolean()
-//       ? faker.lorem.words(faker.datatype.number({ min: 1, max: 30 }))
-//       : null,
-//     links: faker.datatype.boolean() ? generateLinkList() : null,
-//   };
-// }
-
-// export function generateHashTagDetails(): HashTagDetails {
-//   return {
-//     id: "hashtag@" + faker.datatype.uuid(),
-//     name: faker.lorem.word(faker.datatype.number({ max: 10, min: 3 })),
-//     saves: {
-//       isSaved: faker.datatype.boolean(),
-//       savesCount: faker.datatype.number({ min: 1, max: 10000000 }),
-//     },
-//     uploads: {
-//       uploadsCount: faker.datatype.number({ min: 1, max: 10000 }),
-//       imagePosts: faker.datatype.boolean()
-//         ? {
-//             category: "hashtag/uploads",
-//             filter: "",
-//             recentTimestamp: 0,
-//             ...generatePaginatedImagePostDetails(),
-//           }
-//         : null,
-//       videoPosts: faker.datatype.boolean()
-//         ? {
-//             category: "hashtag/uploads",
-//             filter: "",
-//             recentTimestamp: 0,
-//             ...generatePaginatedVideoPostInfo(),
-//           }
-//         : null,
-//     },
-//   };
-// }
-
-// export function generateVideoPostPreviewInfo(): VideoPostPreviewInfo {
-//   const media = generateMediaInfo();
-//   media.uri = "http://d23dyxeqlo5psv.cloudfront.net/big_buck_bunny.mp4";
-
-//   return {
-//     author: generateAccountInfo(),
-//     id: "videoPost@" + faker.datatype.uuid(),
-//     thumbnail: generateMediaInfo(),
-//     timestamp: faker.date.past(5, Date()).getMilliseconds(),
-//     title: faker.lorem.words(faker.datatype.number({ max: 16, min: 1 })),
-//     viewsCount: faker.datatype.number({ min: 0, max: 10000000 }),
-//     genre: "comedy",
-//     isSaved: faker.datatype.boolean(),
-//     description: faker.datatype.boolean()
-//       ? faker.lorem.words(faker.datatype.number({ min: 1, max: 100 }))
-//       : null,
-//     likesCount: faker.datatype.number({ min: 0, max: 10000 }),
-//     preview: {
-//       media,
-//       slice: faker.datatype.boolean() ? [0, 10] : null,
-//     },
-//   };
-// }
-
 export function generateKeyWords(): string[] {
   const list: string[] = [];
   list.push("all");
@@ -695,286 +398,70 @@ export function generateKeyWords(): string[] {
   return list;
 }
 
-// export function generateCommentInfo(): CommentInfo {
-//   return {
-//     author: generateAccountInfo(),
-//     content: faker.lorem.words(faker.datatype.number({ min: 3, max: 100 })),
-//     id: "comment@" + faker.datatype.uuid(),
-//     isLiked: faker.datatype.boolean(),
-//     likesCount: faker.datatype.number({ min: 0, max: 10000 }),
-//     repliesCount: faker.datatype.number({ min: 0, max: 10000 }),
-//     timestamp: faker.date.past(2, Date()).getMilliseconds(),
-//   };
-// }
-
-// export function generateCommentInfoList(length: number = 10): CommentInfo[] {
-//   const list: CommentInfo[] = [];
-
-//   for (let i = 0; i < length; i++) {
-//     list.push(generateCommentInfo());
-//   }
-
-//   return list;
-// }
-
-// export function generatePaginatedCommentInfo(
-//   pageId: number = 0
-// ): PageResponse<CommentInfo> {
-//   return {
-//     id: pageId,
-//     length: 10,
-//     size: 10,
-//     noOfPages: 1000,
-//     list: generateCommentInfoList(),
-//   };
-// }
-
-// export function generateReplyInfo(): ReplyInfo {
-//   return {
-//     author: generateAccountInfo(),
-//     content: faker.lorem.words(faker.datatype.number({ min: 3, max: 100 })),
-//     id: "comment@" + faker.datatype.uuid(),
-//     isLiked: faker.datatype.boolean(),
-//     likesCount: faker.datatype.number({ min: 0, max: 10000 }),
-//     timestamp: faker.date.past(2, Date()).getMilliseconds(),
-//   };
-// }
-
-// export function generateReplyInfoList(length: number = 10): ReplyInfo[] {
-//   const list: ReplyInfo[] = [];
-
-//   for (let i = 0; i < length; i++) {
-//     list.push(generateReplyInfo());
-//   }
-
-//   return list;
-// }
-
-// export function generatePaginatedReplyInfo(
-//   pageId: number = 0
-// ): PageResponse<ReplyInfo> {
-//   return {
-//     id: pageId,
-//     length: 10,
-//     size: 10,
-//     noOfPages: 1000,
-//     list: generateReplyInfoList(),
-//   };
-// }
-
-//------------------------------------------------------------------------------------------------------------
-
-//-------------------------------------------converters------------------------------------------------------
-
-export function convertCommentinfoToComment(source: CommentInfo): Comment {
+export function generateVideoThumbnailResponse(): VideoThumbnailResponse {
   return {
-    author: source.author.id,
-    content: source.content,
-    id: source.id,
-    likes: {
-      isLiked: source.isLiked,
-      likesCount: source.likesCount,
-    },
-    replies: {
-      repliesCount: source.repliesCount,
-    },
-    timestamp: source.timestamp,
+    author: generateAccountMediumResponse(),
+    duration: 30,
+    noOfLikes: faker.datatype.number({ min: 0, max: 100000 }),
+    noOfViews: faker.datatype.number({ min: 0, max: 1000000 }),
+    thumbnail: generateMediaInfo(),
+    title: faker.lorem.words(faker.datatype.number({ min: 3, max: 12 })),
+    watchtime: Math.floor(30 * Math.random()),
+    id: "video@" + faker.datatype.uuid(),
+    timestamp: faker.date.past(1, Date()).getMilliseconds(),
   };
 }
 
-export function convertHashTagInfoToHashTag(source: HashTagInfo): HashTag {
+export function generateVideoThumbnailResponseList(
+  length: number = faker.datatype.number({ min: 1, max: 8 })
+): VideoThumbnailResponse[] {
+  const list: VideoThumbnailResponse[] = [];
+
+  for (let i = 0; i < length; i++) {
+    list.push(generateVideoThumbnailResponse());
+  }
+
+  return list;
+}
+
+export function generateReplyResponse(): ReplyResponse {
   return {
-    id: source.id,
-    name: source.name,
-    saves: {
-      isSaved: source.isSaved,
-    },
-    uploads: {
-      uploadsCount: source.uploadsCount,
-    },
+    author: generateAccountShortResponse(),
+    content: faker.lorem.words(faker.datatype.number({ min: 3, max: 50 })),
+    hasLiked: faker.datatype.boolean(),
+    id: "content@" + faker.datatype.uuid(),
+    noOfLikes: faker.datatype.number({ min: 0, max: 2000 }),
+    timestamp: faker.date.past(1, Date()).getMilliseconds(),
   };
 }
 
-export function convertHashTagDetailsToHashTag(
-  source: HashTagDetails
-): HashTag {
+export function generateReplyResponseList(
+  length: number = faker.datatype.number({ min: 1, max: 16 })
+): ReplyResponse[] {
+  const list: ReplyResponse[] = [];
+
+  for (let i = 0; i < length; i++) {
+    list.push(generateReplyResponse());
+  }
+
+  return list;
+}
+
+export function generateCommentResponse(): CommentResponse {
   return {
-    id: source.id,
-    name: source.name,
-    saves: {
-      isSaved: source.saves.isSaved,
-      savesCount: source.saves.savesCount,
-    },
-    uploads: {
-      uploadsCount: source.uploads.uploadsCount,
-      imagePosts: source.uploads.imagePosts?.list?.map(
-        (imagePost) => imagePost.id
-      ),
-      videoPosts: source.uploads.videoPosts?.list?.map(
-        (videoPost) => videoPost.id
-      ),
-    },
+    ...generateReplyResponse(),
+    noOfReplies: faker.datatype.number({ min: 0, max: 2000 }),
   };
 }
 
-export function convertAccountInfoToAccount(source: AccountInfo): Account {
-  return {
-    followers: {
-      followersCount: source.followersCount,
-      isFollower: source.isFollower,
-    },
-    followings: {
-      isFollowing: source.isFollowing,
-    },
-    id: source.id,
-    profilePictureUri: source.profilePictureUri,
-    socialId: source.socialId,
-    username: source.username,
-  };
-}
+export function generateCommentResponseList(
+  length: number = faker.datatype.number({ min: 1, max: 16 })
+): CommentResponse[] {
+  const list: CommentResponse[] = [];
 
-export function convertAccountDetailsToAccount(
-  source: AccountDetails
-): Account {
-  return {
-    followers: {
-      followersCount: source.followers.followersCount,
-      isFollower: source.followers.isFollower,
-      filteredFollowers: source.followers.filteredFollowers?.map(
-        (account) => account.id
-      ),
-    },
-    followings: {
-      isFollowing: source.followings.isFollowing,
-      followingsCount: source.followings.followingsCount,
-    },
-    id: source.id,
-    profilePictureUri: source.profilePictureUri,
-    socialId: source.socialId,
-    username: source.username,
-    uploads: {
-      uploadsCount: source.uploads.uploadsCount,
-      imagePosts: source.uploads.imagePosts?.list?.map(
-        (imagePost) => imagePost.id
-      ),
-      videoPosts: source.uploads.videoPosts?.list?.map(
-        (videoPost) => videoPost.id
-      ),
-    },
-    bio: source.bio,
-    links: source.links,
-  };
-}
+  for (let i = 0; i < length; i++) {
+    list.push(generateCommentResponse());
+  }
 
-// export function convertImagePostInfoToImagePost(
-//   source: ImagePostInfo
-// ): ImagePost {
-//   return {
-//     author: source.author.id,
-//     id: source.id,
-//     images: source.images,
-//     isSaved: source.isSaved,
-//     likes: {
-//       isLiked: source.isLiked,
-//     },
-//     timestamp: source.timestamp,
-//   };
-// }
-
-export function convertImagePostDetailsToImagePost(
-  source: ImagePostDetails
-): ImagePost {
-  return {
-    author: source.author.id,
-    id: source.id,
-    images: source.images,
-    isSaved: source.isSaved,
-    likes: {
-      isLiked: source.likes.isLiked,
-      filteredLikes: source.likes.filteredLikes?.map((account) => account.id),
-      likesCount: source.likes.likesCount,
-    },
-    timestamp: source.timestamp,
-    caption: source.caption,
-    comments: {
-      commentsCount: source.commentsCount,
-    },
-    genre: source.genre,
-    shares: {
-      sharesCount: source.sharesCount,
-    },
-    hashtags: source.hashtags?.map((hashtag) => hashtag.id),
-    tags: source.tags?.map((account) => account.id),
-  };
+  return list;
 }
-
-export function convertVideoPostInfoToVideoPost(
-  source: VideoPostInfo
-): VideoPost {
-  return {
-    author: source.author.id,
-    duration: source.duration,
-    id: source.id,
-    likes: {
-      likesCount: source.likesCount,
-    },
-    thumbnail: source.thumbnail,
-    timestamp: source.timestamp,
-    title: source.title,
-    watchTime: source.watchTime,
-    viewsCount: source.viewsCount,
-  };
-}
-
-export function convertVideoPostDetailsToVideoPost(
-  source: VideoPostDetails
-): VideoPost {
-  return {
-    author: source.author.id,
-    duration: source.duration,
-    id: source.id,
-    likes: {
-      likesCount: source.likes.likesCount,
-      filteredLikes: source.likes.filteredLikes?.map((account) => account.id),
-      isLiked: source.likes.isLiked,
-    },
-    thumbnail: source.thumbnail,
-    timestamp: source.timestamp,
-    title: source.title,
-    watchTime: source.watchTime,
-    viewsCount: source.viewsCount,
-    comments: {
-      commentsCount: source.commentsCount,
-    },
-    description: source.description,
-    genre: source.genre,
-    hashtags: source.hashtags?.map((hashtag) => hashtag.id),
-    isSaved: source.isSaved,
-    shares: {
-      sharesCount: source.sharesCount,
-    },
-    video: source.video,
-    tags: source.tags?.map((account) => account.id),
-  };
-}
-
-export function convertVideoPostPreviewInfoToVideoPost(
-  source: VideoPostPreviewInfo
-): VideoPost {
-  return {
-    author: source.author.id,
-    timestamp: source.timestamp,
-    id: source.id,
-    thumbnail: source.thumbnail,
-    preview: source.preview,
-    viewsCount: source.viewsCount,
-    title: source.title,
-    isSaved: source.isSaved,
-    likes: {
-      likesCount: source.likesCount,
-    },
-    description: source.description,
-    genre: source.genre,
-  };
-}
-//-----------------------------------------------------------------------------------------------------------

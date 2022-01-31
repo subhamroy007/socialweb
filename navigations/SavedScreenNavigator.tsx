@@ -19,13 +19,6 @@ import SavedImagePostScreen from "../screens/saved/SavedImagePostScreen";
 import SavedVideoPostScreen from "../screens/saved/SavedVideoPostScreen";
 import { useFocusEffect } from "@react-navigation/native";
 import { useAppDispatch, useAppSelector } from "../store/appStore";
-import { getInitSavedDataThunk } from "../store/appData/reducer";
-import {
-  selectSavedHashTagIdList,
-  selectSavedImagePostIdList,
-  selectSavedScreenState,
-  selectSavedVideoPostIdList,
-} from "../store/appData/selector";
 import LoadingIndicator from "../components/global/LoadingIndicator";
 import BlankScreenPlaceHolder from "../components/global/BlankScreenPlaceHolder";
 
@@ -94,56 +87,30 @@ const savedVideoScreenOptions: MaterialTopTabNavigationOptions = {
 };
 
 const SavedScreenNavigator = () => {
-  const state = useAppSelector(selectSavedScreenState);
-
-  const hashTagIdList = useAppSelector(selectSavedHashTagIdList);
-  const imagePostIdList = useAppSelector(selectSavedImagePostIdList);
-  const videoPostIdList = useAppSelector(selectSavedVideoPostIdList);
-
-  const dispatch = useAppDispatch();
-
-  useFocusEffect(
-    useCallback(() => {
-      dispatch(getInitSavedDataThunk());
-    }, [])
-  );
-
   return (
     <>
-      {!state || state === "loading" ? (
-        <LoadingIndicator
-          color="black"
-          size={SIZE_REF_10 * 4}
-          style={styles.spinnerStaticStyle}
+      <SavedScreenTab.Navigator
+        initialLayout={initialScreenLayout}
+        backBehavior="none"
+        screenOptions={defaultScreenOptions}
+      >
+        <SavedScreenTab.Screen
+          name="SavedHashTagScreen"
+          component={SavedHashTagScreen}
+          options={savedHashTagScreenOptions}
         />
-      ) : state === "failure" &&
-        (!hashTagIdList || hashTagIdList.length === 0) &&
-        (!imagePostIdList || imagePostIdList.length === 0) &&
-        (!videoPostIdList || videoPostIdList.length === 0) ? (
-        <BlankScreenPlaceHolder icon="chevron-down" text="" />
-      ) : (
-        <SavedScreenTab.Navigator
-          initialLayout={initialScreenLayout}
-          backBehavior="none"
-          screenOptions={defaultScreenOptions}
-        >
-          <SavedScreenTab.Screen
-            name="SavedHashTagScreen"
-            component={SavedHashTagScreen}
-            options={savedHashTagScreenOptions}
-          />
-          <SavedScreenTab.Screen
-            name="SavedImagePostScreen"
-            component={SavedImagePostScreen}
-            options={savedImageScreenOptions}
-          />
-          <SavedScreenTab.Screen
-            name="SavedVideoPostScreen"
-            component={SavedVideoPostScreen}
-            options={savedVideoScreenOptions}
-          />
-        </SavedScreenTab.Navigator>
-      )}
+        <SavedScreenTab.Screen
+          name="SavedImagePostScreen"
+          component={SavedImagePostScreen}
+          options={savedImageScreenOptions}
+        />
+        <SavedScreenTab.Screen
+          name="SavedVideoPostScreen"
+          component={SavedVideoPostScreen}
+          options={savedVideoScreenOptions}
+        />
+      </SavedScreenTab.Navigator>
+      )
     </>
   );
 };

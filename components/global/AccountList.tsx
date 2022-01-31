@@ -45,7 +45,7 @@ const AccountList = ({
   return (
     <FlatList
       data={ids}
-      keyExtractor={keyExtractor}
+      // keyExtractor={keyExtractor}
       renderItem={renderItem}
       extraData={dataState}
       ListFooterComponent={footerComponentCallback}

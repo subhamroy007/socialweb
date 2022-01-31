@@ -8,14 +8,22 @@ import appStore from "./store/appStore";
 import RootStackNavigator from "./navigations/RootStackNavigator";
 import { createServer } from "miragejs";
 import {
+  AccountWithTimestampResponse,
   ApiResponse,
+  CommentResponse,
   FeedData,
   FeedMeta,
   ImagePostResponse,
+  ListResponseMetaData,
+  PostType,
+  VideoThumbnailResponse,
 } from "./utility/types";
 import {
+  generateAccountWithTimestampResponseList,
+  generateCommentResponseList,
   generateImagePostResponseList,
   generateKeyWords,
+  generateVideoThumbnailResponseList,
 } from "./utility/helpers";
 import {
   initialWindowMetrics,
@@ -29,17 +37,151 @@ const server = createServer({
     this.timing = 2000;
     this.get("/images/feed", (_, request) => {
       const userId = request.queryParams["userid"];
-      console.log(userId + " is requesting the image feed inital data");
+      const pageId = request.queryParams["pageid"];
+      const keyword = request.queryParams["keyword"];
 
       const response: ApiResponse<FeedMeta, FeedData<ImagePostResponse>> = {
         meta: {
           category: "feed",
           filter: { id: userId },
           type: "image",
-          page: { id: 0, length: 12, noOfPages: 1000, size: 12 },
-          keywords: generateKeyWords(),
+          page: {
+            id: !pageId || pageId === "" ? 0 : parseInt(pageId),
+            length: 12,
+            noOfPages: 1000,
+            size: 12,
+          },
+          keywords: !keyword || keyword === "" ? generateKeyWords() : undefined,
         },
         data: { list: generateImagePostResponseList(12) },
+      };
+
+      return response;
+    });
+    this.get("/videos/feed", (_, request) => {
+      const userId = request.queryParams["userid"];
+      const pageId = request.queryParams["pageid"];
+      const keyword = request.queryParams["keyword"];
+
+      const response: ApiResponse<
+        FeedMeta,
+        FeedData<VideoThumbnailResponse>
+      > = {
+        meta: {
+          category: "feed",
+          filter: { id: userId },
+          type: "image",
+          page: {
+            id: !pageId || pageId === "" ? 0 : parseInt(pageId),
+            length: 12,
+            noOfPages: 1000,
+            size: 12,
+          },
+          keywords: !keyword || keyword === "" ? generateKeyWords() : undefined,
+        },
+        data: { list: generateVideoThumbnailResponseList(6) },
+      };
+
+      return response;
+    });
+    this.get("/comments/:type", (_, request) => {
+      const postType = request.params["type"];
+      const id = request.queryParams["id"];
+      const pageId = request.queryParams["pageid"];
+      const userId = request.queryParams["userid"];
+      const respose: ApiResponse<
+        ListResponseMetaData<PostType>,
+        { list: CommentResponse[]; count: number }
+      > = {
+        meta: {
+          category: postType === "imagepost" ? "image-post" : "video-post",
+          page: {
+            id: parseInt(pageId),
+            length: 16,
+            noOfPages: 1000,
+            size: 16,
+          },
+          type: "comment",
+          params: {
+            id: id,
+            pageId: pageId,
+            userId: userId,
+          },
+        },
+        data: {
+          list: generateCommentResponseList(16),
+          count: 2500,
+        },
+      };
+
+      return respose;
+    });
+    this.get("/likes/:type", (_, request) => {
+      const postType = request.params["type"];
+      const id = request.queryParams["id"];
+      const pageId = request.queryParams["pageid"];
+      const userId = request.queryParams["userid"];
+      const query = request.queryParams["query"];
+
+      const response: ApiResponse<
+        ListResponseMetaData<PostType>,
+        { list: AccountWithTimestampResponse[]; count: number }
+      > = {
+        meta: {
+          category: "image-post",
+          page: {
+            id: parseInt(pageId),
+            length: 16,
+            noOfPages: 1000,
+            size: 16,
+          },
+          type: "account",
+          params: {
+            id: id,
+            pageId: pageId,
+            userId: userId,
+            query: query,
+          },
+        },
+        data: {
+          count: 2500,
+          list: generateAccountWithTimestampResponseList(16),
+        },
+      };
+
+      return response;
+    });
+    this.get("/shares/:type", (_, request) => {
+      const postType = request.params["type"];
+      const id = request.queryParams["id"];
+      const pageId = request.queryParams["pageid"];
+      const userId = request.queryParams["userid"];
+      const query = request.queryParams["query"];
+
+      const response: ApiResponse<
+        ListResponseMetaData<PostType>,
+        { list: AccountWithTimestampResponse[]; count: number }
+      > = {
+        meta: {
+          category: "image-post",
+          page: {
+            id: parseInt(pageId),
+            length: 16,
+            noOfPages: 1000,
+            size: 16,
+          },
+          type: "account",
+          params: {
+            id: id,
+            pageId: pageId,
+            userId: userId,
+            query: query,
+          },
+        },
+        data: {
+          count: 2500,
+          list: generateAccountWithTimestampResponseList(16),
+        },
       };
 
       return response;
@@ -107,13 +249,13 @@ const App = () => {
   }
 
   return (
-    <SafeAreaProvider initialMetrics={initialWindowMetrics}>
-      <Provider store={appStore}>
+    <Provider store={appStore}>
+      <SafeAreaProvider initialMetrics={initialWindowMetrics}>
         <NavigationContainer onReady={appReadyCallback}>
           <RootStackNavigator />
         </NavigationContainer>
-      </Provider>
-    </SafeAreaProvider>
+      </SafeAreaProvider>
+    </Provider>
   );
 };
 

@@ -74,12 +74,7 @@ export default class ImagePost extends Component<ImagePostResponse> {
     } = this.props;
 
     return (
-      <Animated.View
-        style={styles.rootContainerStaticStyle}
-        entering={FadeInUp.duration(200).easing(Easing.in(Easing.quad))}
-        exiting={FadeOutDown.duration(200).easing(Easing.out(Easing.quad))}
-        layout={SequencedTransition.duration(200)}
-      >
+      <Animated.View style={styles.rootContainerStaticStyle}>
         <Header
           style={styles.headerStaticStyle}
           hasSeparator={true}
@@ -118,7 +113,7 @@ export default class ImagePost extends Component<ImagePostResponse> {
           noOfLikes={noOfLikes}
           {...restProps}
         />
-        <ImagePostControls hasLiked={hasLiked} hasSaved={hasSaved} />
+        <ImagePostControls hasLiked={hasLiked} hasSaved={hasSaved} id={id} />
         {hashtags && (
           <FlatList
             data={hashtags}

@@ -11,14 +11,16 @@ import Animated, {
   Easing,
   interpolate,
   runOnJS,
-  runOnUI,
   useAnimatedGestureHandler,
   useAnimatedStyle,
   useSharedValue,
   withTiming,
 } from "react-native-reanimated";
-import { selectShutterConfiguration } from "../../store/appData/selector";
-import { RootState, useAppSelector } from "../../store/appStore";
+import {
+  selectProfilePictureUri,
+  selectShutterConfig,
+} from "../../store/appData/selectors";
+import { useAppSelector } from "../../store/appStore";
 import {
   SIZE_REF_10,
   SIZE_REF_12,
@@ -55,11 +57,13 @@ const getIconNameFromScreenName = (
 };
 
 const Shutter = ({ insets, state, navigation }: BottomTabBarProps) => {
-  const animatableValue = useSharedValue(0);
+  const animatableValue = useSharedValue<number>(0);
+
+  const configuration = useAppSelector(selectShutterConfig);
+
+  const profilePictureUri = useAppSelector(selectProfilePictureUri);
 
   const [isOverlayVisible, setOverlayVisible] = useState<boolean>(false);
-
-  const configuration = useAppSelector(selectShutterConfiguration);
 
   const translationYMin = -(WINDOW_HEIGHT * 0.47 - SIZE_REF_10 * 4);
 
@@ -307,11 +311,12 @@ const Shutter = ({ insets, state, navigation }: BottomTabBarProps) => {
               if (item === "ProfileScreen") {
                 return (
                   <Avatar
-                    showStoryIndicator={false}
                     size={SIZE_REF_16 * 3}
-                    id="roybond007"
                     key={"item" + index}
                     style={styles.avatarStaticStyle}
+                    profilePictureUri={profilePictureUri}
+                    hasUnSeenStroy={false}
+                    showOutline={false}
                   />
                 );
               }

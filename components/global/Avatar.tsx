@@ -1,41 +1,17 @@
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
-import React, { useCallback, useMemo, useState } from "react";
-import { StyleProp, StyleSheet, View, ViewStyle } from "react-native";
-import FastImage, { ImageStyle, Source } from "react-native-fast-image";
-import {
-  HandlerStateChangeEvent,
-  State,
-  TapGestureHandler,
-  TapGestureHandlerEventPayload,
-} from "react-native-gesture-handler";
-import {
-  selectUserId,
-  selectUserProfilePictureDataUrl,
-} from "../../store/appData/selector";
-import { RootState, useAppSelector } from "../../store/appStore";
-import { selectUserProfilePictureUrl } from "../../store/user/selector";
-import {
-  SIZE_REF_10,
-  SIZE_REF_16,
-  SIZE_REF_2,
-  SIZE_REF_4,
-} from "../../utility/constants";
-import { RootStackNavigatorParamList } from "../../utility/types";
+import React from "react";
+import { StyleSheet, View } from "react-native";
+import FastImage from "react-native-fast-image";
+import { TapGestureHandler } from "react-native-gesture-handler";
+import { SIZE_REF_10, SIZE_REF_2, SIZE_REF_4 } from "../../utility/constants";
+import { AvatarProps, RootStackNavigatorParamList } from "../../utility/types";
 
 //not completely type safe
 type AvatarNavigatorProps = StackNavigationProp<
   RootStackNavigatorParamList,
   "Tabs"
 >;
-
-export interface AvatarProps {
-  profilePictureUri: string;
-  size?: number;
-  hasUnSeenStroy?: boolean;
-  style?: StyleProp<ViewStyle>;
-  showOutline?: boolean;
-}
 
 const Avatar = ({
   profilePictureUri,
