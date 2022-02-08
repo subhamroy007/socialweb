@@ -1,80 +1,97 @@
-import React, { useCallback } from "react";
-import { ListRenderItemInfo, StyleSheet } from "react-native";
+import { Component, ReactNode } from "react";
+import { ListRenderItemInfo, StyleSheet, View } from "react-native";
 import { FlatList } from "react-native-gesture-handler";
-import { SIZE_REF_10, SIZE_REF_8 } from "../../utility/constants";
+import {
+  SIZE_REF_10,
+  SIZE_REF_16,
+  WINDOW_WIDTH,
+} from "../../utility/constants";
 import { createKeyExtractor } from "../../utility/helpers";
-import { ListProps } from "../../utility/types";
-import { AccountInfo } from "./EntityInfo";
+import { globalColors, globalLayouts } from "../../utility/styles";
+import {
+  AccountMediumResponse,
+  AccountWithTimestampResponse,
+} from "../../utility/types";
+import Account from "./Account";
+import Header from "./Header";
+import InputBox from "./InputBox";
 import ItemSeparator from "./ItemSeparator";
 import LoadingIndicator from "./LoadingIndicator";
+import TextBox from "./TextBox";
 
-const renderItem = (item: ListRenderItemInfo<string>) => {
-  return <AccountInfo id={item.item} />;
-};
+export interface AccountListProps {
+  likes?: AccountMediumResponse[];
+}
 
-const keyExtractor = createKeyExtractor("account");
+export const LIKES_BATCH_SIZE = 12;
 
-const AccountList = ({
-  ids,
-  dataState,
-  headerComponent,
-  onEndReach,
-}: ListProps) => {
-  const footerComponentCallback = useCallback(
-    () =>
-      dataState === "loading" ? (
-        <LoadingIndicator color="black" size={SIZE_REF_10 * 4} />
-      ) : null,
-    [dataState]
-  );
+export default class AccountList extends Component<AccountListProps> {
+  keyExtractor: (item: AccountMediumResponse, index: number) => string =
+    createKeyExtractor("accounts");
+  constructor(props: AccountListProps) {
+    super(props);
+  }
 
-  const itemLayoutCallback = useCallback(
-    (data: any[] | null | undefined, index: number) => ({
-      index,
-      length: SIZE_REF_8 * 8,
-      offset: index * SIZE_REF_8 * 8,
-    }),
-    []
-  );
+  renderComments({ item }: ListRenderItemInfo<AccountMediumResponse>) {
+    return <Account {...item} />;
+  }
 
-  const itemSeparatorCallback = useCallback(
-    () => <ItemSeparator axis="horizontal" length={SIZE_REF_8} />,
-    []
-  );
+  itemSeparator() {
+    return <ItemSeparator axis="horizontal" length={SIZE_REF_16} />;
+  }
 
-  return (
-    <FlatList
-      data={ids}
-      // keyExtractor={keyExtractor}
-      renderItem={renderItem}
-      extraData={dataState}
-      ListFooterComponent={footerComponentCallback}
-      getItemLayout={itemLayoutCallback}
-      ItemSeparatorComponent={itemSeparatorCallback}
-      style={styles.listStaticStyle}
-      contentContainerStyle={[
-        styles.listContentContainerStaticStyle,
-        !headerComponent ? styles.optionalTopPadding : undefined,
-      ]}
-      showsVerticalScrollIndicator={false}
-      ListHeaderComponent={headerComponent}
-      onEndReachedThreshold={0.2}
-      onEndReached={onEndReach}
-    />
-  );
-};
+  shouldComponentUpdate({ likes }: AccountListProps) {
+    return likes !== this.props.likes;
+  }
+
+  render(): ReactNode {
+    const { likes } = this.props;
+
+    return (
+      <View style={[globalColors.screenColor, globalLayouts.screenLayout]}>
+        <FlatList
+          style={styles.listStaticStyle}
+          showsVerticalScrollIndicator={false}
+          data={likes}
+          renderItem={this.renderComments}
+          keyExtractor={this.keyExtractor}
+          initialNumToRender={LIKES_BATCH_SIZE}
+          maxToRenderPerBatch={LIKES_BATCH_SIZE}
+          scrollEventThrottle={20}
+          contentContainerStyle={styles.contentContainerStaticStyle}
+          ItemSeparatorComponent={this.itemSeparator}
+          ListEmptyComponent={
+            <View style={styles.emptyComponentContainerStaticStyle}>
+              <LoadingIndicator size={SIZE_REF_10 * 5} />
+            </View>
+          }
+          ListHeaderComponent={
+            <Header
+              leftSideComponent={
+                <TextBox placeholder="search account..." type="solid" />
+              }
+              style={{ width: WINDOW_WIDTH, marginVertical: SIZE_REF_16 }}
+            />
+          }
+        />
+      </View>
+    );
+  }
+}
 
 const styles = StyleSheet.create({
   listStaticStyle: {
     width: "100%",
     flex: 1,
   },
-  listContentContainerStaticStyle: {
-    paddingBottom: SIZE_REF_8,
+  contentContainerStaticStyle: {
+    alignItems: "center",
   },
-  optionalTopPadding: {
-    paddingTop: SIZE_REF_8,
+  emptyComponentContainerStaticStyle: {
+    flexWrap: "nowrap",
+    alignItems: "center",
+    justifyContent: "center",
+    width: WINDOW_WIDTH,
+    marginTop: WINDOW_WIDTH * 0.5,
   },
 });
-
-export default AccountList;

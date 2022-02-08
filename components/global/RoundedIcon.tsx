@@ -1,10 +1,18 @@
 import React from "react";
-import { StyleSheet, View } from "react-native";
+import { Platform, PlatformColor, StyleSheet, View } from "react-native";
 import {
   PanGestureHandler,
   TapGestureHandler,
 } from "react-native-gesture-handler";
-import { SIZE_REF_16 } from "../../utility/constants";
+import {
+  SIZE_12,
+  SIZE_REF_1,
+  SIZE_REF_10,
+  SIZE_REF_12,
+  SIZE_REF_16,
+  SOLID_COLOR_3,
+  SOLID_COLOR_7,
+} from "../../utility/constants";
 import { RoundedIconProps } from "../../utility/types";
 import Icon from "./Icon";
 
@@ -23,20 +31,20 @@ const RoundedIcon = ({
 }: RoundedIconProps) => {
   const calculatedType = type ? type : "solid";
 
-  const calculatedScale = scale ? scale : 0.5;
-  const calculatedSize = size ? size : SIZE_REF_16 * 3;
-  const calculatedBackgroundColor = backgroundColor
-    ? backgroundColor
-    : calculatedType === "outline"
-    ? "transparent"
-    : "#EBE8FB";
+  const calculatedScale = scale ? scale : 0.7;
+  const calculatedSize = size ? size : SIZE_REF_10 * 4;
 
-  const calculatedBorderColor = borderColor ? borderColor : "white";
-  const calculatedBorderWidth = borderWidth
-    ? borderWidth
-    : calculatedType === "outline"
-    ? StyleSheet.hairlineWidth
-    : 0;
+  const calculatedBackgroundColor =
+    calculatedType === "outline"
+      ? "transparent"
+      : backgroundColor
+      ? backgroundColor
+      : SOLID_COLOR_7;
+
+  const calculatedBorderWidth =
+    calculatedType === "solid" ? 0 : borderWidth ? borderWidth : SIZE_REF_1;
+
+  const calculatedBorderColor = borderColor ? borderColor : SOLID_COLOR_3;
 
   return (
     <TapGestureHandler

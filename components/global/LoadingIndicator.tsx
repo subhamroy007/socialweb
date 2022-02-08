@@ -1,8 +1,7 @@
 import React, { useEffect } from "react";
-import { StyleProp, StyleSheet, View, ViewStyle } from "react-native";
+import { StyleProp, StyleSheet, ViewStyle } from "react-native";
 import Animated, {
   Easing,
-  FadeOut,
   useAnimatedStyle,
   useSharedValue,
   withRepeat,
@@ -10,6 +9,7 @@ import Animated, {
 } from "react-native-reanimated";
 import { SIZE_REF_8 } from "../../utility/constants";
 import Icon from "./Icon";
+import NewIcon from "./NewIcon";
 
 export interface LoadingIndicatorProps {
   size?: number;
@@ -49,7 +49,7 @@ const LoadingIndicator = ({ size, color, style }: LoadingIndicatorProps) => {
         styles.rootConatainerStaticStyle,
       ]}
     >
-      <Icon color={calculatedColor} name="loading" size={calculatedSize} />
+      <Icon name="loading" color={calculatedColor} size={calculatedSize} />
     </Animated.View>
   );
 };

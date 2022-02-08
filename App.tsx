@@ -11,18 +11,24 @@ import {
   AccountWithTimestampResponse,
   ApiResponse,
   CommentResponse,
+  DataCategory,
   FeedData,
   FeedMeta,
+  HashTagLongResponse,
   ImagePostResponse,
   ListResponseMetaData,
   PostType,
+  ReplyResponse,
   VideoThumbnailResponse,
 } from "./utility/types";
 import {
   generateAccountWithTimestampResponseList,
+  generateCommentResponse,
   generateCommentResponseList,
+  generateHashTagLongResponseList,
   generateImagePostResponseList,
   generateKeyWords,
+  generateReplyResponseList,
   generateVideoThumbnailResponseList,
 } from "./utility/helpers";
 import {
@@ -34,7 +40,7 @@ enableScreens(true);
 
 const server = createServer({
   routes() {
-    this.timing = 2000;
+    this.timing = 4000;
     this.get("/images/feed", (_, request) => {
       const userId = request.queryParams["userid"];
       const pageId = request.queryParams["pageid"];
@@ -117,18 +123,18 @@ const server = createServer({
       return respose;
     });
     this.get("/likes/:type", (_, request) => {
-      const postType = request.params["type"];
+      const postType = request.params["type"] as PostType | "comment" | "reply";
       const id = request.queryParams["id"];
       const pageId = request.queryParams["pageid"];
       const userId = request.queryParams["userid"];
       const query = request.queryParams["query"];
 
       const response: ApiResponse<
-        ListResponseMetaData<PostType>,
-        { list: AccountWithTimestampResponse[]; count: number }
+        ListResponseMetaData<PostType | "comment" | "reply">,
+        { list: AccountWithTimestampResponse[]; count?: number }
       > = {
         meta: {
-          category: "image-post",
+          category: postType,
           page: {
             id: parseInt(pageId),
             length: 16,
@@ -144,7 +150,7 @@ const server = createServer({
           },
         },
         data: {
-          count: 2500,
+          count: pageId === "0" ? 2500 : undefined,
           list: generateAccountWithTimestampResponseList(16),
         },
       };
@@ -152,7 +158,7 @@ const server = createServer({
       return response;
     });
     this.get("/shares/:type", (_, request) => {
-      const postType = request.params["type"];
+      const postType = request.params["type"] as PostType;
       const id = request.queryParams["id"];
       const pageId = request.queryParams["pageid"];
       const userId = request.queryParams["userid"];
@@ -160,10 +166,10 @@ const server = createServer({
 
       const response: ApiResponse<
         ListResponseMetaData<PostType>,
-        { list: AccountWithTimestampResponse[]; count: number }
+        { list: AccountWithTimestampResponse[]; count?: number }
       > = {
         meta: {
-          category: "image-post",
+          category: postType,
           page: {
             id: parseInt(pageId),
             length: 16,
@@ -179,8 +185,134 @@ const server = createServer({
           },
         },
         data: {
-          count: 2500,
+          count: pageId === "0" ? 2500 : undefined,
           list: generateAccountWithTimestampResponseList(16),
+        },
+      };
+
+      return response;
+    });
+    this.get("/replys", (_, request) => {
+      const id = request.queryParams["id"];
+      const pageId = request.queryParams["pageid"];
+      const userId = request.queryParams["userid"];
+
+      const response: ApiResponse<
+        ListResponseMetaData<"comment">,
+        { list: ReplyResponse[]; count?: number; comment?: CommentResponse }
+      > = {
+        meta: {
+          category: "comment",
+          page: {
+            id: !pageId || pageId === "" ? 0 : parseInt(pageId),
+            length: 16,
+            noOfPages: 1000,
+            size: 16,
+          },
+          type: "reply",
+          params: {
+            id: id,
+            pageId: pageId,
+            userId: userId,
+          },
+        },
+        data: {
+          comment:
+            !pageId || pageId === "" ? undefined : generateCommentResponse(),
+          count: !pageId || pageId === "" ? undefined : 2645,
+          list: generateReplyResponseList(16),
+        },
+      };
+      return response;
+    });
+    this.get("/hashtags/trending", (_, request) => {
+      const userId = request.queryParams["userid"];
+      const pageId = request.queryParams["pageid"];
+      const genre = request.queryParams["genre"];
+
+      const response: ApiResponse<
+        ListResponseMetaData<DataCategory>,
+        { list: HashTagLongResponse[] }
+      > = {
+        meta: {
+          type: "hashtag",
+          category: "trend",
+          page: {
+            id: !pageId || pageId === "" ? 0 : parseInt(pageId),
+            length: 12,
+            noOfPages: 1000,
+            size: 12,
+          },
+          params: {
+            userId,
+            pageId,
+            genre,
+          },
+        },
+        data: {
+          list: generateHashTagLongResponseList(12),
+        },
+      };
+
+      return response;
+    });
+    this.get("/videos/trending", (_, request) => {
+      const userId = request.queryParams["userid"];
+      const pageId = request.queryParams["pageid"];
+      const genre = request.queryParams["genre"];
+
+      const response: ApiResponse<
+        ListResponseMetaData<DataCategory>,
+        { list: VideoThumbnailResponse[] }
+      > = {
+        meta: {
+          type: "video-post",
+          category: "trend",
+          page: {
+            id: !pageId || pageId === "" ? 0 : parseInt(pageId),
+            length: 8,
+            noOfPages: 1000,
+            size: 8,
+          },
+          params: {
+            userId,
+            pageId,
+            genre,
+          },
+        },
+        data: {
+          list: generateVideoThumbnailResponseList(8),
+        },
+      };
+
+      return response;
+    });
+    this.get("/images/trending", (_, request) => {
+      const userId = request.queryParams["userid"];
+      const pageId = request.queryParams["pageid"];
+      const genre = request.queryParams["genre"];
+
+      const response: ApiResponse<
+        ListResponseMetaData<DataCategory>,
+        { list: ImagePostResponse[] }
+      > = {
+        meta: {
+          type: "image-post",
+          category: "trend",
+          page: {
+            id: !pageId || pageId === "" ? 0 : parseInt(pageId),
+            length: 18,
+            noOfPages: 1000,
+            size: 18,
+          },
+          params: {
+            userId,
+            pageId,
+            genre,
+          },
+        },
+        data: {
+          list: generateImagePostResponseList(18),
         },
       };
 

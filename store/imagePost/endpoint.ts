@@ -1,6 +1,7 @@
 import {
   AccountWithTimestampResponse,
   ApiResponse,
+  DataCategory,
   FeedData,
   FeedMeta,
   ImagePostResponse,
@@ -25,68 +26,26 @@ const imagePostEndPoint = appEndPoint.injectEndpoints({
       keepUnusedDataFor: 30,
       providesTags: [{ type: "image", id: "LIST/FEED" }],
     }),
-    getImagePostLikes: build.query<
+    getTrendingImages: build.query<
       ApiResponse<
-        ListResponseMetaData<PostType>,
-        { list: AccountWithTimestampResponse[]; count: number }
+        ListResponseMetaData<DataCategory>,
+        { list: ImagePostResponse[] }
       >,
-      {
-        userId: string;
-        pageId: number;
-        id: string;
-        type: PostType;
-        query?: string;
-      }
+      { userId: string; pageId?: number; genre?: string }
     >({
-      query: ({ userId, pageId, id, type, query }) => ({
+      query: ({ userId, genre, pageId }) => ({
         url:
-          "likes/" +
-          (type === "image-post" ? "imagepost" : "videopost") +
-          "?userid=" +
+          "images/trending?userid=" +
           userId +
-          "&id=" +
-          id +
-          "&pageid=" +
-          pageId +
-          (query ? "&query=" + query : ""),
+          (genre ? "&genre=" + genre : "") +
+          (pageId ? "&pageid=" + pageId : ""),
       }),
       keepUnusedDataFor: 30,
-      providesTags: [{ type: "account", id: "LIST/LIKES" }],
-    }),
-    getImagePostShares: build.query<
-      ApiResponse<
-        ListResponseMetaData<PostType>,
-        { list: AccountWithTimestampResponse[]; count: number }
-      >,
-      {
-        userId: string;
-        pageId: number;
-        id: string;
-        type: PostType;
-        query?: string;
-      }
-    >({
-      query: ({ userId, pageId, id, type, query }) => ({
-        url:
-          "shares/" +
-          (type === "image-post" ? "imagepost" : "videopost") +
-          "?userid=" +
-          userId +
-          "&id=" +
-          id +
-          "&pageid=" +
-          pageId +
-          (query ? "&query=" + query : ""),
-      }),
-      keepUnusedDataFor: 30,
-      providesTags: [{ type: "account", id: "LIST/LIKES" }],
+      providesTags: [{ type: "image", id: "LIST/TREND" }],
     }),
   }),
   overrideExisting: true,
 });
 
-export const {
-  useGetImagePostFeedDataQuery,
-  useGetImagePostLikesQuery,
-  useGetImagePostSharesQuery,
-} = imagePostEndPoint;
+export const { useGetImagePostFeedDataQuery, useGetTrendingImagesQuery } =
+  imagePostEndPoint;

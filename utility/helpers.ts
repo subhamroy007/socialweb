@@ -3,6 +3,7 @@ import {
   AccountShortResponse,
   AccountWithTimestampResponse,
   CommentResponse,
+  HashTagLongResponse,
   HashTagShortResponse,
   ImageConfig,
   ImagePostResponse,
@@ -461,6 +462,27 @@ export function generateCommentResponseList(
 
   for (let i = 0; i < length; i++) {
     list.push(generateCommentResponse());
+  }
+
+  return list;
+}
+
+export function generateHashTagLongResponse(): HashTagLongResponse {
+  return {
+    id: "hashtag@" + faker.datatype.uuid(),
+    isFollowing: faker.datatype.boolean(),
+    name: "#" + faker.lorem.word(faker.datatype.number({ min: 5, max: 20 })),
+    noOfUploads: faker.datatype.number({ min: 100, max: 1000000 }),
+  };
+}
+
+export function generateHashTagLongResponseList(
+  length: number = 16
+): HashTagLongResponse[] {
+  const list: HashTagLongResponse[] = [];
+
+  for (let i = 0; i < length; i++) {
+    list.push(generateHashTagLongResponse());
   }
 
   return list;

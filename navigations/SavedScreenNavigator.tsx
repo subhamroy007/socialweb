@@ -1,4 +1,4 @@
-import React, { useCallback } from "react";
+import React from "react";
 import {
   createMaterialTopTabNavigator,
   MaterialTopTabNavigationOptions,
@@ -6,7 +6,6 @@ import {
 import Icon from "../components/global/Icon";
 import {
   HEADER_HEIGHT,
-  SHUTTER_HEIGHT,
   SIZE_REF_10,
   SIZE_REF_6,
   WINDOW_HEIGHT,
@@ -17,16 +16,12 @@ import { SavedScreenNavigatorParamList } from "../utility/types";
 import SavedHashTagScreen from "../screens/saved/SavedHashTagScreen";
 import SavedImagePostScreen from "../screens/saved/SavedImagePostScreen";
 import SavedVideoPostScreen from "../screens/saved/SavedVideoPostScreen";
-import { useFocusEffect } from "@react-navigation/native";
-import { useAppDispatch, useAppSelector } from "../store/appStore";
-import LoadingIndicator from "../components/global/LoadingIndicator";
-import BlankScreenPlaceHolder from "../components/global/BlankScreenPlaceHolder";
 
 const SavedScreenTab =
   createMaterialTopTabNavigator<SavedScreenNavigatorParamList>();
 
 const defaultScreenOptions: MaterialTopTabNavigationOptions = {
-  lazy: true,
+  lazy: false,
   tabBarShowLabel: false,
   tabBarPressColor: "transparent",
   tabBarPressOpacity: 1,
@@ -49,14 +44,6 @@ const defaultScreenOptions: MaterialTopTabNavigationOptions = {
     width: "100%",
     height: "100%",
   },
-};
-
-const initialScreenLayout = {
-  width: WINDOW_WIDTH,
-  height:
-    WINDOW_HEIGHT -
-    (StatusBar.currentHeight ? StatusBar.currentHeight : 0) -
-    HEADER_HEIGHT,
 };
 
 const savedHashTagScreenOptions: MaterialTopTabNavigationOptions = {
@@ -88,39 +75,27 @@ const savedVideoScreenOptions: MaterialTopTabNavigationOptions = {
 
 const SavedScreenNavigator = () => {
   return (
-    <>
-      <SavedScreenTab.Navigator
-        initialLayout={initialScreenLayout}
-        backBehavior="none"
-        screenOptions={defaultScreenOptions}
-      >
-        <SavedScreenTab.Screen
-          name="SavedHashTagScreen"
-          component={SavedHashTagScreen}
-          options={savedHashTagScreenOptions}
-        />
-        <SavedScreenTab.Screen
-          name="SavedImagePostScreen"
-          component={SavedImagePostScreen}
-          options={savedImageScreenOptions}
-        />
-        <SavedScreenTab.Screen
-          name="SavedVideoPostScreen"
-          component={SavedVideoPostScreen}
-          options={savedVideoScreenOptions}
-        />
-      </SavedScreenTab.Navigator>
-      )
-    </>
+    <SavedScreenTab.Navigator
+      backBehavior="none"
+      // screenOptions={defaultScreenOptions}
+    >
+      <SavedScreenTab.Screen
+        name="SavedHashTagScreen"
+        component={SavedHashTagScreen}
+        // options={savedHashTagScreenOptions}
+      />
+      <SavedScreenTab.Screen
+        name="SavedImagePostScreen"
+        component={SavedImagePostScreen}
+        // options={savedImageScreenOptions}
+      />
+      <SavedScreenTab.Screen
+        name="SavedVideoPostScreen"
+        component={SavedVideoPostScreen}
+        // options={savedVideoScreenOptions}
+      />
+    </SavedScreenTab.Navigator>
   );
 };
-
-const styles = StyleSheet.create({
-  spinnerStaticStyle: {
-    width: "100%",
-    flex: 1,
-    backgroundColor: "#FDFDFD",
-  },
-});
 
 export default SavedScreenNavigator;

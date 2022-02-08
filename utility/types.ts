@@ -44,6 +44,11 @@ export interface TabListProps {
   ) => ReactNode;
   focusedIndex?: number;
   onIndexChange?: (index: number) => void;
+  onScrollCallback?: (value: number) => void;
+}
+
+export interface TabListState {
+  loadedIndices: { [key: number]: boolean };
 }
 
 export interface LazyLoadingContainerProps {
@@ -52,6 +57,125 @@ export interface LazyLoadingContainerProps {
   width: number;
   height: number;
 }
+
+export interface NewIconProps {
+  name: IconType;
+  style?: StyleProp<ViewStyle>;
+  size?: number;
+  color?: string;
+  onTap?: () => void;
+}
+
+export type IconType =
+  | "add-song"
+  | "around-the-clock-bold"
+  | "around-the-clock-regular"
+  | "arrow-down"
+  | "arrow-up"
+  | "arrow-left"
+  | "arrow-right"
+  | "bookmark-outline-bold"
+  | "bookmark-outline-regular"
+  | "bookmark-solid"
+  | "camera-outline-bold"
+  | "camera-outline-regular"
+  | "camera-solid"
+  | "caption-outline-bold"
+  | "caption-outline-regular"
+  | "caption-solid"
+  | "chevron-down"
+  | "chevron-left"
+  | "chevron-right"
+  | "chevron-up"
+  | "comment-outline-bold"
+  | "comment-outline-regular"
+  | "comment-solid"
+  | "edit-outline-regular"
+  | "edit-solid"
+  | "flag-outline"
+  | "flag-solid"
+  | "follow"
+  | "following"
+  | "full-screen"
+  | "gear-outline-bold"
+  | "gear-outline-regular"
+  | "gear-solid"
+  | "group-outline-regular"
+  | "group-outline-bold"
+  | "group-solid"
+  | "hashtag-outline-bold"
+  | "hashtag-outline-regular"
+  | "hashtag-solid"
+  | "heart-outline-regular"
+  | "heart-outline-bold"
+  | "heart-solid"
+  | "hide"
+  | "history-regular"
+  | "history-bold"
+  | "image-nav-bold"
+  | "image-nav-regular"
+  | "live-outline-regular"
+  | "live-outline-bold"
+  | "live-solid"
+  | "loading"
+  | "magnify-bold"
+  | "magnify-regular"
+  | "message-outline-bold"
+  | "message-outline-regular"
+  | "message-solid"
+  | "minimize"
+  | "more-outline"
+  | "more-solid"
+  | "mute-outline-bold"
+  | "mute-outline-regular"
+  | "mute-solid"
+  | "next"
+  | "notification-outline-regular"
+  | "notification-outline-bold"
+  | "notification-solid"
+  | "paperclip-bold"
+  | "paperclip-regular"
+  | "pause"
+  | "phone-outline-bold"
+  | "phone-outline-regular"
+  | "phone-solid"
+  | "play"
+  | "playback-forward"
+  | "playback-backward"
+  | "playlist-add"
+  | "playlist-check"
+  | "plus-outline-bold"
+  | "plus-outline-regular"
+  | "previous"
+  | "remove-song"
+  | "retry"
+  | "send-outline-bold"
+  | "send-outline-regular"
+  | "send-solid"
+  | "share-outline-bold"
+  | "share-outline-regular"
+  | "share-solid"
+  | "show"
+  | "tag-outline-bold"
+  | "tag-outline-regular"
+  | "trending-outline-bold"
+  | "trending-outline-regular"
+  | "trending-solid"
+  | "user-outline-bold"
+  | "user-outline-regular"
+  | "trending-solid"
+  | "user-outline-bold"
+  | "user-outline-regular"
+  | "user-solid"
+  | "video-outline-bold"
+  | "video-outline-regular"
+  | "video-solid"
+  | "volume-high-outline"
+  | "volume-high-solid"
+  | "volume-medium-outline"
+  | "volume-medium-solid"
+  | "volume-low-outline"
+  | "volume-low-solid";
 
 export interface InfoProps {
   pictureSize?: number;
@@ -266,17 +390,17 @@ export type FollowerFollowingNavigatorParamList = {
 
 export type RootStackNavigatorParamList = {
   Tabs: NavigatorScreenParams<RootTabNavigatorParamList>;
-  LiveScreen: undefined;
-  StoryFeedScreen: undefined;
   PostEngagementScreen: {
     id: string;
     type: PostType;
     initialTabIndex: number;
   };
-  OverlayScreen: undefined;
   VideoPreviewScreen: { id: string };
   VideoPostScreen: { id: string };
-  FollowerFollowingStack: NavigatorScreenParams<FollowerFollowingNavigatorParamList>;
+  CommentEngagementScreen: {
+    id: string;
+    initialTabIndex: number;
+  };
 };
 
 export type SearchScreenNavigationParamList = {
@@ -447,8 +571,16 @@ export interface ReplyResponse {
   hasLiked: boolean;
 }
 
+export interface HashTagLongResponse {
+  id: string;
+  name: string;
+  isFollowing: boolean;
+  noOfUploads: number;
+}
+
 export interface CommentResponse extends ReplyResponse {
   noOfReplies: number;
+  isMetaHidden?: boolean;
 }
 
 export interface ImagePostOverlayProps extends BoxUtil {

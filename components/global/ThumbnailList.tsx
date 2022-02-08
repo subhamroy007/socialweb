@@ -8,51 +8,49 @@ import {
 } from "../../utility/constants";
 import { createKeyExtractor } from "../../utility/helpers";
 import { globalColors, globalLayouts } from "../../utility/styles";
-import { AccountWithTimestampResponse } from "../../utility/types";
-import Account from "./Account";
-import Header from "./Header";
-import InputBox from "./InputBox";
+import { VideoThumbnailResponse } from "../../utility/types";
+import VideoThumbnail from "../videoPost/VideoThumbnail";
 import ItemSeparator from "./ItemSeparator";
 import LoadingIndicator from "./LoadingIndicator";
 
-export interface LikeListProps {
-  likes?: AccountWithTimestampResponse[];
+const VIDEO_BATCH_SIZE = 10;
+
+export interface ThumbnailListProps {
+  thumbnails?: VideoThumbnailResponse[] | null;
 }
 
-export const LIKES_BATCH_SIZE = 12;
-
-export default class LikeList extends Component<LikeListProps> {
-  keyExtractor: (item: AccountWithTimestampResponse, index: number) => string =
-    createKeyExtractor("likes");
-  constructor(props: LikeListProps) {
+export default class ThumbnailList extends Component<ThumbnailListProps> {
+  keyExtractor: (item: VideoThumbnailResponse, index: number) => string =
+    createKeyExtractor("thumbnails");
+  constructor(props: ThumbnailListProps) {
     super(props);
   }
 
-  renderComments({ item }: ListRenderItemInfo<AccountWithTimestampResponse>) {
-    return <Account {...item} />;
+  renderComments({ item }: ListRenderItemInfo<VideoThumbnailResponse>) {
+    return <VideoThumbnail {...item} />;
   }
 
   itemSeparator() {
     return <ItemSeparator axis="horizontal" length={SIZE_REF_16} />;
   }
 
-  shouldComponentUpdate({ likes }: LikeListProps) {
-    return likes !== this.props.likes;
+  shouldComponentUpdate({ thumbnails }: ThumbnailListProps) {
+    return thumbnails !== this.props.thumbnails;
   }
 
   render(): ReactNode {
-    const { likes } = this.props;
+    const { thumbnails } = this.props;
 
     return (
       <View style={[globalColors.screenColor, globalLayouts.screenLayout]}>
         <FlatList
           style={styles.listStaticStyle}
           showsVerticalScrollIndicator={false}
-          data={likes}
+          data={thumbnails}
           renderItem={this.renderComments}
           keyExtractor={this.keyExtractor}
-          initialNumToRender={LIKES_BATCH_SIZE}
-          maxToRenderPerBatch={LIKES_BATCH_SIZE}
+          initialNumToRender={VIDEO_BATCH_SIZE}
+          maxToRenderPerBatch={VIDEO_BATCH_SIZE}
           scrollEventThrottle={20}
           contentContainerStyle={styles.contentContainerStaticStyle}
           ItemSeparatorComponent={this.itemSeparator}
@@ -60,12 +58,6 @@ export default class LikeList extends Component<LikeListProps> {
             <View style={styles.emptyComponentContainerStaticStyle}>
               <LoadingIndicator size={SIZE_REF_10 * 5} />
             </View>
-          }
-          ListHeaderComponent={
-            <Header
-              leftSideComponent={<InputBox placeholder="search accounts..." />}
-              style={{ width: WINDOW_WIDTH, marginVertical: SIZE_REF_16 }}
-            />
           }
         />
       </View>

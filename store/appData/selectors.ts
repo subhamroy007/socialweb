@@ -16,3 +16,11 @@ export const selectProfilePictureUri = createDraftSafeSelector<
   (state) => state.appData.userDetails.profilePictureDataUri,
   (uri) => uri
 );
+
+export const selectUserId = createDraftSafeSelector<
+  [(state: RootState) => string],
+  string
+>(
+  (state) => state.appData.userDetails.id,
+  (id) => id
+);

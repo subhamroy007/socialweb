@@ -1,79 +1,136 @@
-import React, { useCallback } from "react";
-import { ListRenderItemInfo, StyleSheet } from "react-native";
+import { Component, ReactElement, ReactNode } from "react";
+import { ListRenderItemInfo, StyleSheet, View } from "react-native";
 import { FlatList } from "react-native-gesture-handler";
-import { SIZE_REF_10, SIZE_REF_8 } from "../../utility/constants";
+import {
+  SIZE_REF_10,
+  SIZE_REF_16,
+  WINDOW_WIDTH,
+} from "../../utility/constants";
 import { createKeyExtractor } from "../../utility/helpers";
-import { ListProps } from "../../utility/types";
+import { globalColors, globalLayouts } from "../../utility/styles";
+import { HashTagLongResponse } from "../../utility/types";
+import HashTag from "./HashTag";
 import ItemSeparator from "./ItemSeparator";
 import LoadingIndicator from "./LoadingIndicator";
+import RoundedIcon from "./RoundedIcon";
 
-// const renderItem = (item: ListRenderItemInfo<string>) => {
-//   return <HashTagInfo id={item.item} />;
-// };
+const ACCOUNT_BATCH_SIZE = 16;
 
-const keyExtractor = createKeyExtractor("hashtag");
+export interface HashTagListProps {
+  hashtags?: HashTagLongResponse[] | null;
+  header?: ReactElement<any>;
+  isLoading: boolean;
+  isError: boolean;
+  onEndReach?: () => void;
+}
 
-const HashTagList = ({
-  ids,
-  dataState,
-  headerComponent,
-  onEndReach,
-}: ListProps) => {
-  const footerComponentCallback = useCallback(
-    () =>
-      dataState === "loading" ? (
-        <LoadingIndicator color="black" size={SIZE_REF_10 * 4} />
-      ) : null,
-    [dataState]
-  );
+export default class HashTagList extends Component<HashTagListProps> {
+  keyExtractor: (item: HashTagLongResponse, index: number) => string =
+    createKeyExtractor("hashtags");
+  constructor(props: HashTagListProps) {
+    super(props);
+  }
 
-  const itemLayoutCallback = useCallback(
-    (data: any[] | null | undefined, index: number) => ({
-      index,
-      length: SIZE_REF_8 * 8,
-      offset: index * SIZE_REF_8 * 8,
-    }),
-    []
-  );
+  renderComments({ item }: ListRenderItemInfo<HashTagLongResponse>) {
+    return <HashTag {...item} />;
+  }
 
-  const itemSeparatorCallback = useCallback(
-    () => <ItemSeparator axis="horizontal" length={SIZE_REF_8} />,
-    []
-  );
+  itemSeparator() {
+    return <ItemSeparator axis="horizontal" length={SIZE_REF_16} />;
+  }
 
-  return (
-    <FlatList
-      onEndReachedThreshold={0.2}
-      onEndReached={onEndReach}
-      ListHeaderComponent={headerComponent}
-      extraData={dataState}
-      data={ids}
-      renderItem={() => null}
-      // keyExtractor={keyExtractor}
-      showsVerticalScrollIndicator={false}
-      ItemSeparatorComponent={itemSeparatorCallback}
-      getItemLayout={itemLayoutCallback}
-      ListFooterComponent={footerComponentCallback}
-      style={styles.listStaticStyle}
-      contentContainerStyle={[
-        styles.listContentContainerStaticStyle,
-        !headerComponent ? styles.optionalTopPadding : undefined,
-      ]}
-    />
-  );
-};
+  shouldComponentUpdate({ hashtags }: HashTagListProps) {
+    return hashtags !== this.props.hashtags;
+  }
+
+  render(): ReactNode {
+    const { hashtags, header, onEndReach, children, ...restprops } = this.props;
+
+    let listEmptyComponent = null;
+    let listFooterComponent = null;
+
+    if (restprops.isLoading) {
+      listEmptyComponent = (
+        <View style={styles.emptyComponentContainerStaticStyle}>
+          <LoadingIndicator size={SIZE_REF_10 * 5} />
+        </View>
+      );
+      if (hashtags && hashtags.length > 0) {
+        listFooterComponent = (
+          <LoadingIndicator
+            size={SIZE_REF_10 * 5}
+            style={{ marginVertical: SIZE_REF_16 }}
+          />
+        );
+      }
+    }
+
+    if (restprops.isError) {
+      listEmptyComponent = (
+        <View style={styles.emptyComponentContainerStaticStyle}>
+          <RoundedIcon name="chevron-down" size={SIZE_REF_10 * 5} scale={0.7} />
+        </View>
+      );
+      if (hashtags && hashtags.length > 0) {
+        listFooterComponent = (
+          <RoundedIcon
+            name="chevron-down"
+            size={SIZE_REF_10 * 5}
+            scale={0.7}
+            style={{ marginVertical: SIZE_REF_16 }}
+          />
+        );
+      } else {
+        listFooterComponent = (
+          <View style={styles.emptyComponentContainerStaticStyle}>
+            <RoundedIcon
+              name="chevron-down"
+              size={SIZE_REF_10 * 5}
+              scale={0.7}
+            />
+          </View>
+        );
+      }
+    }
+
+    return (
+      <View style={[globalColors.screenColor, globalLayouts.screenLayout]}>
+        <FlatList
+          style={styles.listStaticStyle}
+          showsVerticalScrollIndicator={false}
+          data={hashtags}
+          renderItem={this.renderComments}
+          keyExtractor={this.keyExtractor}
+          initialNumToRender={ACCOUNT_BATCH_SIZE}
+          maxToRenderPerBatch={ACCOUNT_BATCH_SIZE}
+          scrollEventThrottle={20}
+          contentContainerStyle={styles.contentContainerStaticStyle}
+          ItemSeparatorComponent={this.itemSeparator}
+          ListEmptyComponent={listEmptyComponent}
+          ListFooterComponent={listFooterComponent}
+          ListHeaderComponent={header}
+          onEndReachedThreshold={0.3}
+          onEndReached={onEndReach}
+          extraData={restprops}
+        />
+      </View>
+    );
+  }
+}
 
 const styles = StyleSheet.create({
   listStaticStyle: {
     width: "100%",
     flex: 1,
   },
-  listContentContainerStaticStyle: {
-    paddingBottom: SIZE_REF_8,
+  contentContainerStaticStyle: {
+    alignItems: "center",
   },
-  optionalTopPadding: {
-    paddingTop: SIZE_REF_8,
+  emptyComponentContainerStaticStyle: {
+    flexWrap: "nowrap",
+    alignItems: "center",
+    justifyContent: "center",
+    width: WINDOW_WIDTH,
+    marginTop: WINDOW_WIDTH * 0.5,
   },
 });
-
-export default HashTagList;

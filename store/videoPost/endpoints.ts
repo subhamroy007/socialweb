@@ -1,7 +1,9 @@
 import {
   ApiResponse,
+  DataCategory,
   FeedData,
   FeedMeta,
+  ListResponseMetaData,
   VideoThumbnailResponse,
 } from "../../utility/types";
 import { appEndPoint } from "../appEndPoint";
@@ -22,8 +24,26 @@ const videoPostEndPoint = appEndPoint.injectEndpoints({
       keepUnusedDataFor: 30,
       providesTags: [{ type: "video", id: "LIST/FEED" }],
     }),
+    getTrendingVideos: build.query<
+      ApiResponse<
+        ListResponseMetaData<DataCategory>,
+        { list: VideoThumbnailResponse[] }
+      >,
+      { userId: string; pageId?: number; genre?: string }
+    >({
+      query: ({ userId, genre, pageId }) => ({
+        url:
+          "videos/trending?userid=" +
+          userId +
+          (genre ? "&genre=" + genre : "") +
+          (pageId ? "&pageid=" + pageId : ""),
+      }),
+      keepUnusedDataFor: 30,
+      providesTags: [{ type: "video", id: "LIST/TREND" }],
+    }),
   }),
   overrideExisting: true,
 });
 
-export const { useGetVideoPostFeedDataQuery } = videoPostEndPoint;
+export const { useGetVideoPostFeedDataQuery, useGetTrendingVideosQuery } =
+  videoPostEndPoint;

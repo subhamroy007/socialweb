@@ -1,13 +1,10 @@
-import { useNavigation } from "@react-navigation/native";
-import { StackScreenProps } from "@react-navigation/stack";
-import React, { useCallback } from "react";
+import React from "react";
 import { StyleSheet, View } from "react-native";
 import { shallowEqual } from "react-redux";
 import {
   SIZE_REF_1,
   SIZE_REF_10,
   SIZE_REF_12,
-  SIZE_REF_14,
   SIZE_REF_16,
   SIZE_REF_4,
   SIZE_REF_6,
@@ -15,52 +12,22 @@ import {
   WINDOW_WIDTH,
 } from "../../utility/constants";
 import { countAbbreviator, timeElapsed } from "../../utility/helpers";
-import {
-  CommentResponse,
-  RootStackNavigatorParamList,
-} from "../../utility/types";
+import { ReplyResponse } from "../../utility/types";
 import { MediumText, RegularText } from "../../utility/ui";
 import Avatar from "./Avatar";
 import CollapsableText from "./CollapsableText";
-import Icon from "./Icon";
 import Info from "./Info";
+import NewIcon from "./NewIcon";
 
-type PostEngagementScreenProps = StackScreenProps<
-  RootStackNavigatorParamList,
-  "PostEngagementScreen"
->;
-
-const Comment = React.memo<CommentResponse>(
+const Reply = React.memo<ReplyResponse>(
   ({
     author: { id: userId, profilePictureUri, socialId },
     content,
     hasLiked,
     id,
     noOfLikes,
-    noOfReplies,
     timestamp,
-    isMetaHidden,
   }) => {
-    const navigation = useNavigation<PostEngagementScreenProps["navigation"]>();
-
-    const onReplyTap = useCallback(() => {
-      if (navigation.isFocused()) {
-        navigation.navigate("CommentEngagementScreen", {
-          id,
-          initialTabIndex: 1,
-        });
-      }
-    }, [navigation, id]);
-
-    const onLikeCountTap = useCallback(() => {
-      if (navigation.isFocused()) {
-        navigation.navigate("CommentEngagementScreen", {
-          id,
-          initialTabIndex: 0,
-        });
-      }
-    }, [navigation, id]);
-
     return (
       <View style={styles.rootContainerStaticStyle}>
         <Info
@@ -85,29 +52,25 @@ const Comment = React.memo<CommentResponse>(
           text={content}
           style={styles.topSideGap}
         />
-        {!isMetaHidden && (
-          <View style={[styles.footerContainerStaticStyle, styles.topSideGap]}>
-            <MediumText style={styles.textStaticStyle} onPress={onReplyTap}>
-              {countAbbreviator(noOfReplies) + " Reply"}
-            </MediumText>
-            <View style={[styles.likeContainer, styles.leftSideGap]}>
-              <RegularText
-                style={styles.textStaticStyle}
-                onPress={onLikeCountTap}
-              >
-                {countAbbreviator(noOfLikes) + " "}
-              </RegularText>
-              {hasLiked ? (
-                <Icon name="heart-solid" color="#EE3434" size={SIZE_REF_16} />
-              ) : (
-                <Icon name="heart-outline" color="grey" size={SIZE_REF_16} />
-              )}
-            </View>
-            <RegularText style={[styles.textStaticStyle, styles.leftSideGap]}>
-              {timeElapsed(timestamp) + " ago"}
+        <View style={[styles.footerContainerStaticStyle, styles.topSideGap]}>
+          <View style={[styles.likeContainer]}>
+            <RegularText style={styles.textStaticStyle}>
+              {countAbbreviator(noOfLikes) + " "}
             </RegularText>
+            {hasLiked ? (
+              <NewIcon name="heart-solid" color="#EE3434" size={SIZE_REF_12} />
+            ) : (
+              <NewIcon
+                name="heart-outline-bold"
+                color="grey"
+                size={SIZE_REF_12}
+              />
+            )}
           </View>
-        )}
+          <RegularText style={[styles.textStaticStyle, styles.leftSideGap]}>
+            {timeElapsed(timestamp) + " ago"}
+          </RegularText>
+        </View>
       </View>
     );
   },
@@ -154,4 +117,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Comment;
+export default Reply;

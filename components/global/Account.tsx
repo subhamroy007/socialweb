@@ -9,13 +9,16 @@ import {
   WINDOW_WIDTH,
 } from "../../utility/constants";
 import { timeElapsed } from "../../utility/helpers";
-import { AccountWithTimestampResponse } from "../../utility/types";
+import {
+  AccountMediumResponse,
+  AccountWithTimestampResponse,
+} from "../../utility/types";
 import { MediumText } from "../../utility/ui";
 import Avatar from "./Avatar";
 import Info from "./Info";
 import RoundedIcon from "./RoundedIcon";
 
-const Account = React.memo<AccountWithTimestampResponse>(
+const Account = React.memo<AccountMediumResponse>(
   ({
     hasUnSeenStroy,
     id,
@@ -24,13 +27,12 @@ const Account = React.memo<AccountWithTimestampResponse>(
     noOfFollowers,
     profilePictureUri,
     socialId,
-    timestamp,
     username,
   }) => {
     return (
       <View style={styles.rootContainerStaticStyle}>
         <Info
-          secondaryText={timestamp === 0 ? username : timeElapsed(timestamp)}
+          secondaryText={username}
           picture={
             <Avatar
               hasUnSeenStroy={hasUnSeenStroy}
@@ -48,11 +50,12 @@ const Account = React.memo<AccountWithTimestampResponse>(
         </Info>
         {isFollowing ? (
           <RoundedIcon
-            name="followed"
+            name="following"
+            color="white"
             size={SIZE_REF_10 * 4}
             scale={0.7}
-            backgroundColor="#3F71F2"
-            color="white"
+            type="outline"
+            borderColor="#D1CBCB"
           />
         ) : (
           <RoundedIcon
@@ -60,7 +63,6 @@ const Account = React.memo<AccountWithTimestampResponse>(
             size={SIZE_REF_10 * 4}
             scale={0.7}
             backgroundColor="#3F71F2"
-            color="white"
           />
         )}
       </View>

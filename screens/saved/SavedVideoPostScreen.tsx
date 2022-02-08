@@ -1,4 +1,4 @@
-import React, { useCallback } from "react";
+import React from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { globalColors, globalLayouts } from "../../utility/styles";

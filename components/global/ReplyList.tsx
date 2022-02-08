@@ -1,9 +1,10 @@
 import { Component, ReactNode } from "react";
 import { ListRenderItemInfo, StyleSheet, View } from "react-native";
 import { FlatList } from "react-native-gesture-handler";
+import { shallowEqual } from "react-redux";
 import {
-  HEADER_HEIGHT,
   SIZE_REF_10,
+  SIZE_REF_12,
   SIZE_REF_16,
   SIZE_REF_6,
   SIZE_REF_8,
@@ -11,55 +12,58 @@ import {
 } from "../../utility/constants";
 import { createKeyExtractor } from "../../utility/helpers";
 import { globalColors, globalLayouts } from "../../utility/styles";
-import { CommentResponse } from "../../utility/types";
+import { CommentResponse, ReplyResponse } from "../../utility/types";
 import { MediumText, RegularText } from "../../utility/ui";
+import Avatar from "./Avatar";
+import CollapsableText from "./CollapsableText";
 import Comment from "./Comment";
-import CommentBox from "./CommentBox";
-import Header from "./Header";
+import Info from "./Info";
 import ItemSeparator from "./ItemSeparator";
 import LoadingIndicator from "./LoadingIndicator";
+import Reply from "./Reply";
 
-export const COMMENT_BATCH_SIZE = 12;
-
-export interface CommentListProps {
-  comments?: CommentResponse[] | null;
-  noOfComments?: number | null;
+export interface ReplyListProps {
+  replys?: ReplyResponse[];
+  noOfReplys?: number;
+  targetComment?: CommentResponse;
 }
 
-export default class CommentList extends Component<CommentListProps> {
-  keyExtractor: (item: CommentResponse, index: number) => string =
-    createKeyExtractor("comments");
-  constructor(props: CommentListProps) {
+const REPLY_BATCH_SIZE = 16;
+
+export default class ReplyList extends Component<ReplyListProps> {
+  keyExtractor: (item: ReplyResponse, index: number) => string =
+    createKeyExtractor("replys");
+  constructor(props: ReplyListProps) {
     super(props);
     this.renderComments = this.renderComments.bind(this);
     this.itemSeparator = this.itemSeparator.bind(this);
   }
 
-  renderComments({ item }: ListRenderItemInfo<CommentResponse>) {
-    return <Comment {...item} />;
+  renderComments({ item }: ListRenderItemInfo<ReplyResponse>) {
+    return <Reply {...item} />;
   }
 
   itemSeparator() {
     return <ItemSeparator axis="horizontal" length={SIZE_REF_16} />;
   }
 
-  shouldComponentUpdate({ comments }: CommentListProps) {
-    return comments !== this.props.comments;
+  shouldComponentUpdate(nextProps: ReplyListProps) {
+    return !shallowEqual(this.props, nextProps);
   }
 
   render(): ReactNode {
-    const { comments, noOfComments } = this.props;
+    const { noOfReplys, replys, targetComment } = this.props;
 
     return (
       <View style={[globalColors.screenColor, globalLayouts.screenLayout]}>
         <FlatList
           style={styles.listStaticStyle}
           showsVerticalScrollIndicator={false}
-          data={comments}
+          data={replys}
           renderItem={this.renderComments}
           keyExtractor={this.keyExtractor}
-          initialNumToRender={COMMENT_BATCH_SIZE}
-          maxToRenderPerBatch={COMMENT_BATCH_SIZE}
+          initialNumToRender={REPLY_BATCH_SIZE}
+          maxToRenderPerBatch={REPLY_BATCH_SIZE}
           scrollEventThrottle={20}
           contentContainerStyle={styles.contentContainerStaticStyle}
           ItemSeparatorComponent={this.itemSeparator}
@@ -69,57 +73,30 @@ export default class CommentList extends Component<CommentListProps> {
             </View>
           }
           ListHeaderComponent={
-            noOfComments ? (
+            targetComment ? (
               <View style={styles.headerStaticStyle}>
+                <Comment {...targetComment} isMetaHidden={true} />
                 <RegularText style={styles.headerTextStaticStyle}>
-                  {noOfComments + " comments"}
+                  {noOfReplys + " replys"}
                 </RegularText>
               </View>
             ) : null
           }
           extraData={this.props}
         />
-        <CommentBox />
       </View>
     );
   }
 }
 
 const styles = StyleSheet.create({
-  headerTextStaticStyle: {
-    fontSize: SIZE_REF_6 * 3,
-    lineHeight: SIZE_REF_6 * 3,
-    color: "grey",
-  },
-  headerStaticStyle: {
-    width: WINDOW_WIDTH,
-    height: HEADER_HEIGHT,
-    flexWrap: "nowrap",
-    justifyContent: "center",
-    alignItems: "center",
-    borderColor: "#D1CBCB",
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    marginBottom: SIZE_REF_16,
-  },
-  writeCommentIconStaticStyle: { marginLeft: SIZE_REF_8 },
-  inputBoxContainerStaticStyle: {
-    width: "100%",
-    borderColor: "#D1CBCB",
-    borderTopWidth: StyleSheet.hairlineWidth,
-    borderLeftWidth: StyleSheet.hairlineWidth,
-    borderRightWidth: StyleSheet.hairlineWidth,
-    flexWrap: "nowrap",
-    alignItems: "center",
-    justifyContent: "center",
-    flexDirection: "row",
-    padding: SIZE_REF_8,
-  },
   listStaticStyle: {
     width: "100%",
     flex: 1,
   },
   contentContainerStaticStyle: {
     alignItems: "center",
+    paddingBottom: SIZE_REF_16,
   },
   emptyComponentContainerStaticStyle: {
     flexWrap: "nowrap",
@@ -127,5 +104,21 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     width: WINDOW_WIDTH,
     marginTop: WINDOW_WIDTH * 0.5,
+  },
+  headerStaticStyle: {
+    width: WINDOW_WIDTH,
+    borderColor: "#D1CBCB",
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    paddingVertical: SIZE_REF_16,
+    flexWrap: "nowrap",
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: SIZE_REF_16,
+  },
+  headerTextStaticStyle: {
+    fontSize: SIZE_REF_6 * 3,
+    lineHeight: SIZE_REF_6 * 3,
+    color: "grey",
+    marginTop: SIZE_REF_16,
   },
 });

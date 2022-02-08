@@ -1,19 +1,20 @@
-import React, { useCallback, useMemo } from "react";
+import React, { useCallback } from "react";
+import { StyleSheet, View } from "react-native";
 import {
-  StyleProp,
-  StyleSheet,
-  TextStyle,
-  View,
-  ViewStyle,
-} from "react-native";
-import {
-  GestureEvent,
   HandlerStateChangeEvent,
   State,
   TapGestureHandler,
   TapGestureHandlerEventPayload,
 } from "react-native-gesture-handler";
-import { SIZE_REF_12 } from "../../utility/constants";
+import {
+  SIZE_REF_1,
+  SIZE_REF_12,
+  SOLID_COLOR_2,
+  SOLID_COLOR_3,
+  SOLID_COLOR_4,
+  SOLID_COLOR_5,
+} from "../../utility/constants";
+import APP_STYLE from "../../utility/styles";
 import { HighlightedItemProps } from "../../utility/types";
 import { MediumText } from "../../utility/ui";
 
@@ -29,25 +30,34 @@ const HighlightedItem = ({
   borderWidth,
   borderRadius,
 }: HighlightedItemProps) => {
-  const calculatedType = type ? type : "solid";
+  const calculatedType = type ? type : "outline";
 
   const calculatedSize = size ? size : SIZE_REF_12;
-  const calculatedBackgroundColor = backgroundColor
-    ? backgroundColor
-    : calculatedType === "outline"
-    ? "transparent"
-    : "#EBE8FB";
-
-  const calculatedBorderColor = borderColor ? borderColor : "#D1CBCB";
-  const calculatedBorderWidth = borderWidth
-    ? borderWidth
-    : calculatedType === "outline"
-    ? StyleSheet.hairlineWidth
-    : 0;
-
-  const calculatedColor = color ? color : "black";
 
   const calculatedBorderRadius = borderRadius ? borderRadius : calculatedSize;
+
+  const calculatedBorderWidth =
+    calculatedType === "solid" ? 0 : borderWidth ? borderWidth : SIZE_REF_1;
+
+  const calculatedBorderColor = borderColor ? borderColor : SOLID_COLOR_3;
+
+  const calculatedBackGroundColor =
+    calculatedType === "outline"
+      ? "transparent"
+      : backgroundColor
+      ? backgroundColor
+      : SOLID_COLOR_2;
+
+  const calculatedColor = color
+    ? color
+    : calculatedType === "outline"
+    ? SOLID_COLOR_4
+    : SOLID_COLOR_5;
+
+  const calculatedPadding =
+    calculatedType === "solid"
+      ? 0.47 * calculatedSize
+      : 0.47 * calculatedSize - calculatedBorderWidth;
 
   const tapHandlerCallback = useCallback(
     ({
@@ -70,14 +80,11 @@ const HighlightedItem = ({
           style,
           styles.rootContainerStaticStyle,
           {
-            borderRadius: calculatedBorderRadius,
-            padding:
-              calculatedType === "solid"
-                ? calculatedSize * 0.47
-                : calculatedSize * 0.47 - calculatedBorderWidth,
+            padding: calculatedPadding,
             borderColor: calculatedBorderColor,
-            backgroundColor: calculatedBackgroundColor,
+            backgroundColor: calculatedBackGroundColor,
             borderWidth: calculatedBorderWidth,
+            borderRadius: calculatedBorderRadius,
           },
         ]}
       >
@@ -97,9 +104,9 @@ const HighlightedItem = ({
 
 const styles = StyleSheet.create({
   rootContainerStaticStyle: {
-    flexWrap: "nowrap",
-    justifyContent: "center",
-    alignItems: "center",
+    ...APP_STYLE.FLEX_NOWRAP,
+    ...APP_STYLE.FLEX_JUSTIFY_CENTER,
+    ...APP_STYLE.FLEX_ALIGN_ITEM_CENTER,
   },
 });
 

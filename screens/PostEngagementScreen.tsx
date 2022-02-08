@@ -16,8 +16,8 @@ import CommentList from "../components/global/CommentList";
 import { StackScreenHeader } from "../components/global/Header";
 import Icon from "../components/global/Icon";
 import Info from "../components/global/Info";
-import LikeList from "../components/global/LikeList";
-import TabList from "../components/tab/TabList";
+import AccountList from "../components/global/AccountList";
+import TabList from "../components/global/TabList";
 import { useGetCommentsQuery } from "../store/comment/endpoints";
 import {
   useGetImagePostLikesQuery,
@@ -26,18 +26,26 @@ import {
 import {
   HEADER_HEIGHT,
   SIZE_REF_10,
+  SIZE_REF_12,
+  SIZE_REF_16,
   SIZE_REF_6,
   WINDOW_HEIGHT,
   WINDOW_WIDTH,
 } from "../utility/constants";
 import { globalColors, globalLayouts } from "../utility/styles";
 import {
+  AccountMediumResponse,
   AccountWithTimestampResponse,
   CommentResponse,
   RootStackNavigatorParamList,
   TabListProps,
 } from "../utility/types";
 import { MediumText } from "../utility/ui";
+import {
+  useGetLikesQuery,
+  useGetSharesQuery,
+} from "../store/account/endpoints";
+import NewIcon from "../components/global/NewIcon";
 
 type PostEngagementScreenProps = StackScreenProps<
   RootStackNavigatorParamList,
@@ -56,17 +64,16 @@ export interface PostEngagementScreenState {
     skipRequest: boolean;
     currentPageId?: number;
     currentPageLength?: number;
-    data: AccountWithTimestampResponse[];
+    data: AccountMediumResponse[];
     noOfLikes?: number;
   };
   sharesTab: {
     skipRequest: boolean;
     currentPageId?: number;
     currentPageLength?: number;
-    data: AccountWithTimestampResponse[];
+    data: AccountMediumResponse[];
     noOfShares?: number;
   };
-  loadedIndices: { [key: number]: boolean };
 }
 
 export const postEngagementScreenStateGenerator =
@@ -75,7 +82,6 @@ export const postEngagementScreenStateGenerator =
       commentsTab: { data: [], skipRequest: true },
       likesTab: { data: [], skipRequest: true },
       sharesTab: { data: [], skipRequest: true },
-      loadedIndices: { 0: false, 1: false, 2: false },
     };
   };
 
@@ -148,14 +154,14 @@ const PostEngagementScreen = ({
     isLikeUninitialized,
     likes,
     noOfLikes,
-  } = useGetImagePostLikesQuery(
+  } = useGetLikesQuery(
     {
       id,
+      type: "comment",
+      userId: "roybond007",
       pageId: screenInfo.likesTab.currentPageId
         ? screenInfo.likesTab.currentPageId + 1
         : 0,
-      type: "image-post",
-      userId: "roybond007",
     },
     {
       pollingInterval: 0,
@@ -197,21 +203,21 @@ const PostEngagementScreen = ({
     isShareUninitialized,
     shares,
     noOfShares,
-  } = useGetImagePostSharesQuery(
+  } = useGetSharesQuery(
     {
       id,
-      pageId: screenInfo.sharesTab.currentPageId
-        ? screenInfo.sharesTab.currentPageId + 1
-        : 0,
-      type: "image-post",
+      type: type,
       userId: "roybond007",
+      pageId: screenInfo.likesTab.currentPageId
+        ? screenInfo.likesTab.currentPageId + 1
+        : 0,
     },
     {
       pollingInterval: 0,
       refetchOnFocus: false,
       refetchOnMountOrArgChange: true,
       refetchOnReconnect: false,
-      skip: screenInfo.sharesTab.skipRequest,
+      skip: screenInfo.likesTab.skipRequest,
       selectFromResult: ({
         isError,
         isFetching,
@@ -246,7 +252,9 @@ const PostEngagementScreen = ({
             currentPageId: currentCommentPageId,
             currentPageLength: currentCommentPageLength,
             skipRequest: true,
-            noOfComments: noOfComments,
+            noOfComments: noOfComments
+              ? noOfComments
+              : info.commentsTab.noOfComments,
           },
         };
       });
@@ -261,7 +269,7 @@ const PostEngagementScreen = ({
           likesTab: {
             data: [...info.likesTab.data, ...likes],
             skipRequest: false,
-            noOfLikes: noOfLikes,
+            noOfLikes: noOfLikes ? noOfLikes : info.likesTab.noOfLikes,
             currentPageId: currentLikePageId,
             currentPageLength: currentLikePageLength,
           },
@@ -278,7 +286,7 @@ const PostEngagementScreen = ({
           sharesTab: {
             data: [...info.sharesTab.data, ...shares],
             skipRequest: false,
-            noOfShares: noOfShares,
+            noOfShares: noOfShares ? noOfShares : info.sharesTab.noOfShares,
             currentPageId: currentSharePageId,
             currentPageLength: currentSharePageLength,
           },
@@ -305,13 +313,14 @@ const PostEngagementScreen = ({
                 leftSideComponent={
                   <Info
                     picture={
-                      <Icon
+                      <NewIcon
                         name="arrow-left"
-                        size={SIZE_REF_10 * 3}
+                        size={SIZE_REF_12 * 2}
                         onTap={onGoBack}
                       />
                     }
                     textSize={SIZE_REF_6 * 3}
+                    pictureGapSize={SIZE_REF_16}
                   >
                     {(size, color) => (
                       <MediumText
@@ -335,13 +344,14 @@ const PostEngagementScreen = ({
                 leftSideComponent={
                   <Info
                     picture={
-                      <Icon
+                      <NewIcon
                         name="arrow-left"
-                        size={SIZE_REF_10 * 3}
+                        size={SIZE_REF_12 * 2}
                         onTap={onGoBack}
                       />
                     }
                     textSize={SIZE_REF_6 * 3}
+                    pictureGapSize={SIZE_REF_16}
                   >
                     {(size, color) => (
                       <MediumText
@@ -365,13 +375,14 @@ const PostEngagementScreen = ({
                 leftSideComponent={
                   <Info
                     picture={
-                      <Icon
+                      <NewIcon
                         name="arrow-left"
-                        size={SIZE_REF_10 * 3}
+                        size={SIZE_REF_12 * 2}
                         onTap={onGoBack}
                       />
                     }
                     textSize={SIZE_REF_6 * 3}
+                    pictureGapSize={SIZE_REF_16}
                   >
                     {(size, color) => (
                       <MediumText
@@ -403,66 +414,51 @@ const PostEngagementScreen = ({
 
   const tabListChildrenCallback = useCallback<TabListProps["children"]>(
     (tab, index, width, height) => {
-      let node: ReactNode = null;
-
       switch (tab) {
         case "comments-list":
-          node = <CommentList comments={screenInfo.commentsTab.data} />;
-          break;
-        case "likes-list":
-          node = <LikeList likes={screenInfo.likesTab.data} />;
-          break;
-        case "shares-list":
-          node = <LikeList likes={screenInfo.sharesTab.data} />;
-          break;
-        default:
-          node = null;
-      }
+          return (
+            <CommentList
+              comments={screenInfo.commentsTab.data}
+              noOfComments={screenInfo.commentsTab.noOfComments}
+            />
+          );
 
-      return (
-        <View
-          key={tab + "-" + index}
-          style={{
-            width,
-            height,
-          }}
-        >
-          {screenInfo.loadedIndices[index] ? node : null}
-        </View>
-      );
+        case "likes-list":
+          return <AccountList likes={screenInfo.likesTab.data} />;
+
+        case "shares-list":
+          return <AccountList likes={screenInfo.sharesTab.data} />;
+      }
     },
     [screenInfo]
   );
 
   const onIndexChange = useCallback(
     (index: number) => {
-      if (!screenInfo.loadedIndices[index]) {
-        setScreenInfo((info) => ({
-          ...info,
-          loadedIndices: { ...info.loadedIndices, [index]: true },
-          commentsTab: {
-            ...info.commentsTab,
-            skipRequest:
-              index === 1 && info.commentsTab.currentPageId === undefined
-                ? false
-                : info.commentsTab.skipRequest,
-          },
-          likesTab: {
-            ...info.likesTab,
-            skipRequest:
-              (index && info.likesTab.currentPageId === undefined) === 0
-                ? false
-                : info.likesTab.skipRequest,
-          },
-          sharesTab: {
-            ...info.sharesTab,
-            skipRequest:
-              (index && info.sharesTab.currentPageId === undefined) === 0
-                ? false
-                : info.sharesTab.skipRequest,
-          },
-        }));
-      }
+      setScreenInfo((info) => ({
+        ...info,
+        commentsTab: {
+          ...info.commentsTab,
+          skipRequest:
+            index === 1 && info.commentsTab.currentPageId === undefined
+              ? false
+              : info.commentsTab.skipRequest,
+        },
+        likesTab: {
+          ...info.likesTab,
+          skipRequest:
+            (index && info.likesTab.currentPageId === undefined) === 0
+              ? false
+              : info.likesTab.skipRequest,
+        },
+        sharesTab: {
+          ...info.sharesTab,
+          skipRequest:
+            (index && info.sharesTab.currentPageId === undefined) === 0
+              ? false
+              : info.sharesTab.skipRequest,
+        },
+      }));
       headerChangeCallback(index);
     },
     [setScreenInfo, screenInfo]
@@ -485,7 +481,7 @@ const PostEngagementScreen = ({
           (HEADER_HEIGHT + Math.max(safeAreaTop, metricsTop, statusBarHeight))
         }
         tabNames={["likes-list", "comments-list", "shares-list"]}
-        focusedIndex={1}
+        focusedIndex={initialTabIndex}
         onIndexChange={onIndexChange}
       >
         {tabListChildrenCallback}

@@ -63,8 +63,6 @@ const Shutter = ({ insets, state, navigation }: BottomTabBarProps) => {
 
   const profilePictureUri = useAppSelector(selectProfilePictureUri);
 
-  const [isOverlayVisible, setOverlayVisible] = useState<boolean>(false);
-
   const translationYMin = -(WINDOW_HEIGHT * 0.47 - SIZE_REF_10 * 4);
 
   const focusedScreen = useMemo<string>(() => {
@@ -119,7 +117,6 @@ const Shutter = ({ insets, state, navigation }: BottomTabBarProps) => {
   >({
     onStart: (_, ctx) => {
       ctx.offset = animatableValue.value;
-      runOnJS(setOverlayVisible)(true);
     },
     onActive: ({ translationY }, ctx) => {
       animatableValue.value = Math.min(
@@ -135,29 +132,17 @@ const Shutter = ({ insets, state, navigation }: BottomTabBarProps) => {
             easing: Easing.out(Easing.linear),
           });
         } else {
-          animatableValue.value = withTiming(
-            0,
-            {
-              duration: 150,
-              easing: Easing.out(Easing.linear),
-            },
-            () => {
-              runOnJS(setOverlayVisible)(false);
-            }
-          );
+          animatableValue.value = withTiming(0, {
+            duration: 150,
+            easing: Easing.out(Easing.linear),
+          });
         }
       } else {
         if (translationY > 0) {
-          animatableValue.value = withTiming(
-            0,
-            {
-              duration: 150,
-              easing: Easing.out(Easing.linear),
-            },
-            () => {
-              runOnJS(setOverlayVisible)(false);
-            }
-          );
+          animatableValue.value = withTiming(0, {
+            duration: 150,
+            easing: Easing.out(Easing.linear),
+          });
         } else {
           animatableValue.value = withTiming(translationYMin, {
             duration: 150,
@@ -172,17 +157,11 @@ const Shutter = ({ insets, state, navigation }: BottomTabBarProps) => {
     TapGestureHandlerGestureEvent,
     {}
   >({
-    onEnd: () => {
-      animatableValue.value = withTiming(
-        0,
-        {
-          duration: 150,
-          easing: Easing.out(Easing.linear),
-        },
-        () => {
-          runOnJS(setOverlayVisible)(false);
-        }
-      );
+    onActive: () => {
+      animatableValue.value = withTiming(0, {
+        duration: 150,
+        easing: Easing.out(Easing.linear),
+      });
     },
   });
 
@@ -297,13 +276,11 @@ const Shutter = ({ insets, state, navigation }: BottomTabBarProps) => {
 
   return (
     <>
-      {isOverlayVisible && (
-        <TapGestureHandler onGestureEvent={tapGestureEventCallback}>
-          <Animated.View
-            style={[styles.overlayStaticStyle, overlayDynamicStyle]}
-          ></Animated.View>
-        </TapGestureHandler>
-      )}
+      <TapGestureHandler onGestureEvent={tapGestureEventCallback}>
+        <Animated.View
+          style={[styles.overlayStaticStyle, overlayDynamicStyle]}
+        ></Animated.View>
+      </TapGestureHandler>
       <PanGestureHandler onGestureEvent={panGestureEventCallback}>
         <Animated.View style={[styles.shutterStaticStyle, shutterDynamicStyle]}>
           <View style={styles.headerContainerStaticStyle}>

@@ -1,76 +1,83 @@
-import React, { useCallback } from "react";
-import { ListRenderItemInfo, StyleSheet } from "react-native";
+import { Component, ReactNode } from "react";
+import { ListRenderItemInfo, StyleSheet, View } from "react-native";
 import { FlatList } from "react-native-gesture-handler";
-import { SIZE_REF_10, SIZE_REF_16, SIZE_REF_8 } from "../../utility/constants";
+import {
+  SIZE_REF_10,
+  SIZE_REF_16,
+  WINDOW_WIDTH,
+} from "../../utility/constants";
 import { createKeyExtractor } from "../../utility/helpers";
-import { ListProps } from "../../utility/types";
+import { globalColors, globalLayouts } from "../../utility/styles";
+import { ImagePostResponse } from "../../utility/types";
 import ImagePost from "../imagePost/ImagePost";
 import ItemSeparator from "./ItemSeparator";
 import LoadingIndicator from "./LoadingIndicator";
 
-// const renderItem = (item: ListRenderItemInfo<string>) => {
-//   return <ImagePost id={item.item} />;
-// };
+const IMAGE_BATCH_SIZE = 12;
 
-const keyExtractor = createKeyExtractor("image");
+export interface ImageListProps {
+  imagePosts?: ImagePostResponse[] | null;
+}
 
-const ImageList = ({
-  ids,
-  dataState,
-  headerComponent,
-  onEndReach,
-  extraData,
-}: ListProps) => {
-  const footerComponentCallback = useCallback(
-    () =>
-      dataState === "loading" ? (
-        <LoadingIndicator color="black" size={SIZE_REF_10 * 4} />
-      ) : null,
-    [dataState]
-  );
+export default class ImageList extends Component<ImageListProps> {
+  keyExtractor: (item: ImagePostResponse, index: number) => string =
+    createKeyExtractor("images");
+  constructor(props: ImageListProps) {
+    super(props);
+  }
 
-  const itemSeparatorCallback = useCallback(
-    () => <ItemSeparator axis="horizontal" length={SIZE_REF_16} />,
-    []
-  );
+  renderComments({ item }: ListRenderItemInfo<ImagePostResponse>) {
+    return <ImagePost {...item} />;
+  }
 
-  return (
-    <FlatList
-      onEndReachedThreshold={0.2}
-      onEndReached={onEndReach}
-      ListHeaderComponent={headerComponent}
-      extraData={{ dataState, ...extraData }}
-      data={ids}
-      renderItem={() => null}
-      // keyExtractor={keyExtractor}
-      showsVerticalScrollIndicator={false}
-      ItemSeparatorComponent={itemSeparatorCallback}
-      ListFooterComponent={footerComponentCallback}
-      style={styles.listStaticStyle}
-      contentContainerStyle={[
-        styles.listContentContainerStaticStyle,
-        !headerComponent ? styles.optionalTopPadding : undefined,
-      ]}
-      removeClippedSubviews={true}
-      maxToRenderPerBatch={4}
-      updateCellsBatchingPeriod={150}
-      initialNumToRender={3}
-      windowSize={7}
-    />
-  );
-};
+  itemSeparator() {
+    return <ItemSeparator axis="horizontal" length={SIZE_REF_16} />;
+  }
+
+  shouldComponentUpdate({ imagePosts }: ImageListProps) {
+    return imagePosts !== this.props.imagePosts;
+  }
+
+  render(): ReactNode {
+    const { imagePosts } = this.props;
+
+    return (
+      <View style={[globalColors.screenColor, globalLayouts.screenLayout]}>
+        <FlatList
+          style={styles.listStaticStyle}
+          showsVerticalScrollIndicator={false}
+          data={imagePosts}
+          renderItem={this.renderComments}
+          keyExtractor={this.keyExtractor}
+          initialNumToRender={IMAGE_BATCH_SIZE}
+          maxToRenderPerBatch={IMAGE_BATCH_SIZE}
+          scrollEventThrottle={20}
+          contentContainerStyle={styles.contentContainerStaticStyle}
+          ItemSeparatorComponent={this.itemSeparator}
+          ListEmptyComponent={
+            <View style={styles.emptyComponentContainerStaticStyle}>
+              <LoadingIndicator size={SIZE_REF_10 * 5} />
+            </View>
+          }
+        />
+      </View>
+    );
+  }
+}
 
 const styles = StyleSheet.create({
   listStaticStyle: {
     width: "100%",
     flex: 1,
   },
-  listContentContainerStaticStyle: {
-    paddingBottom: SIZE_REF_8,
+  contentContainerStaticStyle: {
+    alignItems: "center",
   },
-  optionalTopPadding: {
-    paddingTop: SIZE_REF_8,
+  emptyComponentContainerStaticStyle: {
+    flexWrap: "nowrap",
+    alignItems: "center",
+    justifyContent: "center",
+    width: WINDOW_WIDTH,
+    marginTop: WINDOW_WIDTH * 0.5,
   },
 });
-
-export default ImageList;
